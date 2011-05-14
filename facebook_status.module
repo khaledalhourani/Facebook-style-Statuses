@@ -756,6 +756,7 @@ function facebook_status_delete_status($sid) {
 function facebook_status_save_status($recipient, $type, $message, $sender = NULL, $options = array()) {
   $sender = (empty($sender) ? $GLOBALS['user'] : $sender);
   $context = facebook_status_determine_context($type);
+  
   $recipient_id = $context['handler']->recipient_id($recipient);
   $time = REQUEST_TIME;
   $message = trim($message);
@@ -765,10 +766,13 @@ function facebook_status_save_status($recipient, $type, $message, $sender = NULL
     'timed override' => TRUE,
     'discard blank statuses' => TRUE,
   );
+ 
   // Calls hook_facebook_status_save_options_alter(&$options).
   drupal_alter('facebook_status_save_options', $options);
   // Pretend to have set a new status if the submitted status is exactly the same as the old one.
   $status = _facebook_status_get_status_fast($sender->uid);
+ 
+  
   // The status object to be saved.
   $object = (object) array(
     'message' => $message,
@@ -777,13 +781,15 @@ function facebook_status_save_status($recipient, $type, $message, $sender = NULL
     'recipient' => $recipient_id,
     'type' => $type,
   );
+   
+  
   if ($message != $status->message || $type != $status->type || $recipient_id != $status->recipient || !$options['discard duplicates']) {
     $edit = FALSE;
     // If a new status is submitted on one's own profile within
     // FACEBOOK_STATUS_OVERRIDE_TIMER seconds of the old one,
     // we assume the user didn't mean to post the first one.
     if ($time - $status->created < FACEBOOK_STATUS_OVERRIDE_TIMER && $type = 'user' && $sender->uid == $recipient_id && $options['timed override']) {
-      $sql = "UPDATE {facebook_status} SET message = '%s', created = %d WHERE sid = %d ORDER BY sid DESC";
+      //---$sql = "UPDATE {facebook_status} SET message = '%s', created = %d WHERE sid = %d ORDER BY sid DESC";
       // TODO Please review the conversion of this statement to the D7 database API syntax.
       /* db_query($sql, $message, $time, $status->sid) */
       db_update('facebook_status')
@@ -791,17 +797,19 @@ function facebook_status_save_status($recipient, $type, $message, $sender = NULL
           'message' => $message,
           'created' => $time,
         ))
-        ->condition('sid', $status->sid)
-        ->condition('ORDER BY sid DESC', '')
+        ->condition('sid', $status->sender)
+        //->condition('ORDER BY sender DESC', '')
         ->execute();
-      $object->sid = $status->sid;
+      $object->sender = $status->sender;
       $edit = TRUE;
+      return object; // --->
     }
     else {
       // Don't save blank messages unless to clear the user's own last status update.
       // The only reason clearing the last status update would even be needed would be if the most recent status update was displayed by itself somewhere.
       if ($type != 'user' || $sender->uid != $recipient_id || !empty($message) || !$options['discard blank statuses']) {
         drupal_write_record('facebook_status', $object);
+        return $object; // killer
       }
     }
     // Invokes hook_facebook_status_save($status, $context, $edit).
@@ -816,7 +824,7 @@ function facebook_status_save_status($recipient, $type, $message, $sender = NULL
     }
   }
   elseif ($message == $status->status) {
-    $object->sid = $status->sid;
+    $object->sender = $status->sender;
   }
   return $object;
 }
@@ -857,7 +865,7 @@ function _facebook_status_run_filter($status) {
  *   A status object.
  */
 function _facebook_status_get_status_fast($uid) {
-  $status = db_fetch_object(db_query("SELECT * FROM {facebook_status} WHERE sender = :sender AND recipient = :recipient AND type = :type ORDER BY sid DESC", array(':sender' => $uid, ':recipient' => $uid, ':type' => 'user')));
+  $status = db_query("SELECT * FROM {facebook_status} WHERE sender = :sender AND recipient = :recipient AND type = :type ORDER BY sid DESC", array(':sender' => $uid, ':recipient' => $uid, ':type' => 'user'))->fetchObject;
   if (!$status) {
     $status = (object) array(
       'sender' => $uid,

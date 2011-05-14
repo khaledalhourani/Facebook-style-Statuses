@@ -11,7 +11,7 @@
 function facebook_status_announce_admin($form, &$form_state) {
   $form = array();
   $form['info'] = array(
-    '#value' => t('Warning: this can be very slow on sites with lots of users.'),
+    '#markup' => t('Warning: this can be very slow on sites with lots of users.'),
   );
   $form['from'] = array(
     '#type' => 'textfield',
@@ -47,7 +47,9 @@ function facebook_status_announce_admin($form, &$form_state) {
  */
 function facebook_status_announce_admin_submit($form, &$form_state) {
   $v = $form_state['values'];
+  
   $from = _facebook_status_user_load_by_name($v['from']);
+  
   if (!$from->uid) {
     $from = FALSE;
   }
@@ -55,15 +57,16 @@ function facebook_status_announce_admin_submit($form, &$form_state) {
     $v['format'] = NULL;
   }
 
-  $count = db_query("SELECT COUNT(*) FROM {users} WHERE status = :status", array(':status' => 1))->fetchField();
+  $count = db_query("SELECT COUNT(DISTINCT uid) FROM {users} WHERE status = :status", array(':status' => 1))->fetchField();
   $batch = array(
     'operations' => array(
       array('facebook_status_announce_generate_status', array($v['message'], $from, $count, $v['format'])),
     ),
     'finished' => 'facebook_status_announce_batch_finished',
     'title' => t('Sending message to all users'),
-    'file' => drupal_get_path('module', 'facebook_status') . '/facebook_status.announce.inc',
+    'file' => drupal_get_path('module', 'facebook_status') . '/includes/utility/facebook_status.announce.inc',
   );
+  
   batch_set($batch);
 }
 
@@ -80,25 +83,52 @@ function facebook_status_announce_admin_submit($form, &$form_state) {
  *   The ID of the input format to use for the message.
  */
 function facebook_status_announce_generate_status($message, $from, $count, $format, &$context) {
+  // because of userid = 1, admin doesn't send himself.
+  $count = $count - 1;
   if (!isset($context['sandbox']['progress'])) {
     $context['sandbox']['progress'] = 0;
+    $context['sandbox']['current_userid'] = 1;
+    $context['sandbox']['max'] = $count;
   }
-  $uid = db_query_range("SELECT uid FROM {users} WHERE status = :status", array(':status' => 1))->fetchField();
-  // Caching here is actually slower than not caching because we should only load each user once.
-  // So we use user_load() instead of _facebook_status_user_load().
-  $to = user_load($uid);
-  facebook_status_save_status($to, 'user', $message, $from);
-  $context['message'] = t('Sending message to %user (@current of @total)',
-    array('%user' => $to->name, '@current' => $context['sandbox']['progress'], '@total' => $count));
-  $context['sandbox']['progress']++;
-  $context['results'][] = check_plain($to->name);
-  $context['finished'] = $context['sandbox']['progress'] / $count;
+  $limit = $count;
+  
+
+  $result = db_select('users', 'uid')
+    ->fields('uid')
+    ->condition('uid', $context['sandbox']['current_userid'], '>')
+    ->condition('status', 1)
+    ->orderBy('uid')
+    ->range(0, $limit)
+    ->execute();
+  
+  foreach ($result as $row) {
+
+    $to = user_load($row->uid);
+    //$context['message'] = check_plain($to->name);
+    
+    facebook_status_save_status($to, 'user', $message, $from);
+    
+    $context['message'] = t('Sending message to @user (@current of @total)',
+    array('@user' => $to->name, '@current' => $context['sandbox']['progress'], '@total' => $count));
+    
+    $context['results'][] = check_plain($to->name);
+    
+    $context['sandbox']['current_userid'] = $to->uid;
+    
+	  if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+	    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+	  }
+	  $context['sandbox']['progress']++;
+    
+  }
+  
 }
 
 /**
  * Batch finished callback.
  */
 function facebook_status_announce_batch_finished($success, $results, $operations) {
+  
   if ($success) {
     $count = count($results);
     if ($count < 50) {
@@ -121,4 +151,5 @@ function facebook_status_announce_batch_finished($success, $results, $operations
     )
     ));
   }
+  
 }

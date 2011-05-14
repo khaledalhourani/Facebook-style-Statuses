@@ -53,6 +53,7 @@ function hook_facebook_status_save_options($options) {
   if (module_exists('fbsmp')) {
     $options['discard duplicates'] = FALSE;
   }
+  return;
 }
 
 /**
