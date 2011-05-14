@@ -44,7 +44,7 @@ function facebook_status_admin($form_state) {
   $views = views_get_all_views();
   $list = array('' => t('None'));
   foreach ($views as $name => $view) {
-    if (isset($view->disabled) == 0) {
+    if (!isset($view->disabled) || $view->disabled != TRUE) {
       $list[$name] = $name;
     }
   }
@@ -52,7 +52,7 @@ function facebook_status_admin($form_state) {
     '#type' => 'select',
     '#title' => t('Show a view under the status update form at the "Share status" page at /statuses/share'),
     '#description' => t('The default facebook_status_stream view is recommended.'),
-    '#default_value' => variable_get('facebook_status_share_view', $list['facebook_status_stream']),
+    '#default_value' => variable_get('facebook_status_share_view', $list['facebook_status_all']),
     '#options' => $list,
     '#weight' => -10,
   );

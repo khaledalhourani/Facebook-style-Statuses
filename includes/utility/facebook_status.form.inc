@@ -28,6 +28,7 @@
  *     have access to use the form
  */
 function theme_facebook_status_form_display($variables) {
+  dsm($variables);
   $context = $variables['recipient'];
   $type = $variables['type'];
   $view = $variables['view'];
@@ -42,6 +43,7 @@ function theme_facebook_status_form_display($variables) {
   elseif (!empty($type)) {
     $recipient = $context;
     $context = facebook_status_determine_context($type);
+    dsm($context);
   }
   // $type is NULL and $context is not, so $context is a full context array.
   else {
@@ -51,9 +53,10 @@ function theme_facebook_status_form_display($variables) {
   if (empty($view) && isset($context['view'])) {
     $view = $context['view'];
   }
+  
   $selectors = module_invoke_all('facebook_status_refresh_selectors', $recipient, $type) + explode("\n", isset($context['selectors']));
   $conversation = (arg(0) == 'statuses' && arg(1) == 'conversation' && $type == 'user');
-  //$output = '';
+  
   $output = '';
   if (facebook_status_user_access('add', $recipient, $type, $user)) {
     $self = '';
