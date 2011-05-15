@@ -38,6 +38,7 @@ function _facebook_status_conversation() {
   drupal_set_title(_facebook_status_conversation_title());
   global $user;
   $args = explode(',', arg(2));
+  
   $count = count($args);
   if ($count > 2 || $count < 1 || ($count == 1 && $args[0] == $user->uid) || !is_numeric($args[0]) || ($count == 2 && !is_numeric($args[1]))) {
     drupal_not_found();
@@ -49,6 +50,8 @@ function _facebook_status_conversation() {
       $args[1] = $user->uid;
     }
     $arg = implode(',', $args);
+    
+    //return views_embed_view('facebook_status_conversation', 'default', $arg, $arg);
     return views_embed_view('facebook_status_conversation', 'default', $arg, $arg);
   }
   $key = $key ? 0 : 1; //The recipient is not the current user.

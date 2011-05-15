@@ -55,8 +55,7 @@ function theme_facebook_status_form_display($variables) {
   $selectors = module_invoke_all('facebook_status_refresh_selectors', $recipient, $type) + explode("\n", isset($context['selectors']));
   $conversation = (arg(0) == 'statuses' && arg(1) == 'conversation' && $type == 'user');
   
-  //$output = '';
-  $output = array();
+  $build = array();
   
   if (facebook_status_user_access('add', $recipient, $type, $user)) {
     $self = '';
@@ -67,27 +66,24 @@ function theme_facebook_status_form_display($variables) {
     if ($conversation) {
       $converse = ' facebook-status-conversation-form';
     }
-    /*$output .= '<div class="clear-block facebook-status-update facebook-status-update-main facebook-status-form-type-' . $type . $self . $converse . '">' .
-      drupal_get_form('facebook_status_box', $recipient, $type) . '</div>';*/
-    $output['#children'] = drupal_get_form('facebook_status_box', $recipient, $type);
-    $output['#wrapper'] = '<div class="clear-block facebook-status-update facebook-status-update-main facebook-status-form-type-' . $type . $self . $converse . '"></div>';
+    $build['content']['#form'] = drupal_get_form('facebook_status_box', $recipient, $type);
+    $build['content']['#prefix'] = '<div class="clear-block facebook-status-update facebook-status-update-main facebook-status-form-type-' . $type . $self . $converse . '">';
+    $build['content']['#suffix'] = '</div>';
   }
   if ($conversation) {
-    $args = explode(',', $arg);
+    $args = explode(',', arg(2));
     $count = count($args);
     if (($count === 1 && $args[0] != $user->uid) || ($count === 2 && is_numeric($args[1])) && is_numeric($args[0])) {
       if (count($args) === 1) {
         $args[1] = $user->uid;
       }
-      $arg = implode(',', $args);
-      //$output .= views_embed_view('facebook_status_conversation', 'default', $arg, $arg);
-      $output['#markup'] = views_embed_view('facebook_status_conversation', 'default', $arg, $arg);
+      $arg = implode('/', $args);
+      $build['content']['#markup'] = views_embed_view('facebook_status_conversation', 'default', $arg);
       $selectors[] = '.view-id-facebook_status_conversation';
     }
   }
   elseif (!empty($view)) {
-    //$output .= views_embed_view($view, 'default', $context['handler']->recipient_id($recipient), $type);
-    $output['#markup'] = views_embed_view($view, 'default', $context['handler']->recipient_id($recipient), $type);
+    $build['content']['#markup'] = views_embed_view($view, 'default', $context['handler']->recipient_id($recipient), $type);
     $selectors[] = '.view-id-' . $view;
   }
   if (!empty($selectors)) {
@@ -96,8 +92,7 @@ function theme_facebook_status_form_display($variables) {
         'refreshIDs' => array_unique($selectors),
       )), array('type' => 'setting', 'scope' => JS_DEFAULT));
   }
-  return drupal_render($output);
-  #return $output;
+  return $build;
 
 }
 
@@ -170,12 +165,12 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     }
   }
 
-  
+  /*
   $path = drupal_get_path('module', 'facebook_status') . '/resources';
   drupal_add_js($path . '/facebook_status.js');
   drupal_add_js($path . '/facebook_status_ahah.js', array('scope' => 'footer'));
   drupal_add_css($path . '/facebook_status.css');
-  
+  */
   
   //$form = array('#cache' => TRUE);
   //Form elements between ['opendiv'] and ['closediv'] will be refreshed via AHAH on form submission.

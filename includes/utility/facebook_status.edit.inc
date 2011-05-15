@@ -12,20 +12,21 @@ function facebook_status_edit($form, &$form_state, $status) {
   #echo '<pre>'.print_r($status, true).'</pre>'; die();
   $context = facebook_status_determine_context($status->type);
   $maxlength = variable_get('facebook_status_length', 140);
-  $path = drupal_get_path('module', 'facebook_status') . '/resources';
+  //$path = drupal_get_path('module', 'facebook_status') . '/resources';
   //drupal_add_js($path . '/facebook_status.js');
-  drupal_add_css($path . '/facebook_status.css');
+  //drupal_add_css($path . '/facebook_status.css');
   $intro = _facebook_status_get_edit_intro($status, $context);
   $self = '';
   if ($status->type == 'user' && $status->sender == $status->recipient) {
     $self = ' facebook-status-form-self-update';
   }
+  $form = array();
   //$form = array('#cache' => TRUE);
   $form['intro'] = array(
     '#type' => 'markup',
     '#markup' => '<span class="facebook-status-intro">' . $intro . '</span>',
-    '#prefix' => '<div class="clear-block facebook-status-update facebook-status-form-type-' . $status->type . $self . '>',
-    '#suffix' => '</div>',
+    //'#prefix' => '<div class="clear-block facebook-status-update facebook-status-form-type-' . $status->type . $self . '>',
+    //'#suffix' => '</div>',
     '#weight' => -45,
   );
   $form['fbss-status'] = array(
@@ -38,7 +39,7 @@ function facebook_status_edit($form, &$form_state, $status) {
   );
   $form['chars'] = array(
     '#type' => 'markup',
-    '#markup' => '<span id="facebook-status-chars">' . t('%chars characters allowed', array('%chars' => $maxlength)) . '</span>',
+    '#markup' => '<span id="facebook-status-chars">' . t('!chars characters allowed', array('!chars' => $maxlength)) . '</span>',
     '#weight' => -38,
   );
   $form['sid'] = array(
@@ -111,7 +112,7 @@ function facebook_status_edit_submit($form, &$form_state) {
 function _facebook_status_delete($form, &$form_state, $status) {
   $form['infotext'] = array(
     '#type' => 'markup',
-    '#markup' => '<p>' . t('Are you sure you want to permanently delete the status %status?', array('%status' => $status->message)) . '</p>'
+    '#markup' => '<p>' . t('Are you sure you want to permanently delete the status !status?', array('!status' => $status->message)) . '</p>'
   );
   $form['confirm'] = array(
     '#type' => 'submit',
@@ -137,7 +138,7 @@ function _facebook_status_delete_confirm($form, &$form_state) {
   $status = facebook_status_load($form_state['values']['status-sid']);
   facebook_status_delete_status($status->sid);
   drupal_set_message(t('Status deleted.'));
-  if ($_GET['destination']) {
+  if (isset($_GET['destination'])) {
     $form_state['redirect'] = $_GET['destination'];
   }
   else {

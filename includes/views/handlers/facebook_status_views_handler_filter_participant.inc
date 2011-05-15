@@ -26,8 +26,19 @@ class facebook_status_views_handler_filter_participant extends views_handler_fil
     $this->query->add_where(
       $this->options['group'],
       "$this->table.sender = %d OR ($this->table.recipient = %d AND $this->table.type = 'user')",
+      $this->value, 
+      $this->value
+    );
+  }
+  
+  /*
+  function query() {
+    $this->query->add_where(
+      $this->options['group'],
+      "$this->table.sender = %d OR ($this->table.recipient = %d AND $this->table.type = 'user')",
       $this->value,
       $this->value
     );
   }
+  */ 
 }

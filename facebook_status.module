@@ -146,7 +146,7 @@ function facebook_status_menu() {
  * The page callback for the share-status page.
  */
 function facebook_status_share_page() {
-  $view = variable_get('facebook_status_share_view', 'facebook_status');
+  $view = variable_get('facebook_status_share_view', 'facebook_status_all');
   return theme('facebook_status_form_display', array('recipient' => $GLOBALS['user'], 'type' => 'user', 'view' => $view));
 }
 
@@ -562,7 +562,7 @@ function facebook_status_get_statuses($senders = array(), $recipients = array(),
   }
   $query .= " ORDER BY created DESC, sid DESC";
   $result = ($total > 0 ? $fn($query, $args, 0, $total) : $fn($query, $args));
-  while ($status = db_fetch_object($result)) {
+  while ($status = $result->fetchObject()) {
     $statuses[] = $status;
   }
   return $statuses;
@@ -683,6 +683,7 @@ function facebook_status_all_contexts() {
   }
   $result = db_query("SELECT * FROM {facebook_status_contexts}");
   $contexts = module_invoke_all('facebook_status_context_info');
+  #echo '<pre>'.print_r($result->fetchAssoc(), true).'</pre>'; die();
   while ($c = $result->fetchAssoc()) {
     $contexts[$c['type']]['in_db'] = TRUE;
     $contexts[$c['type']]['weight'] = $c['weight'];
@@ -844,7 +845,7 @@ function _facebook_status_element_sort($a, $b) {
  */
 function _facebook_status_run_filter($status) {
   if (variable_get('facebook_status_filter', 'none') != 'none') {
-    return check_markup($status, variable_get('facebook_status_filter', 'none'), $langcode = '' /* TODO Set this variable. */, FALSE);
+    return check_markup($status, variable_get('facebook_status_filter', 'none'), $langcode = '', FALSE); /* TODO Set this variable LANGCODE. */
   }
   return check_plain($status);
 }
@@ -949,7 +950,7 @@ function facebook_status_facebook_status_context_info() {
 
 /**
  * Implements hook_trigger_info().
- */
+
 function facebook_status_trigger_info() {
   $info = array(
     'facebook_status' => array(
@@ -980,6 +981,7 @@ function facebook_status_trigger_info() {
   }
   return $info;
 }
+*/
 
 /**
  * Implements hook_facebook_status().
