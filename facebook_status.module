@@ -27,9 +27,9 @@ function facebook_status_help($path, $arg) {
     return t('Creates social streams of "status updates" for users or other entities.') . ' ' .
       t('Please see the <a href="@project">Project page</a> or <a href="@docs">documentation</a> for more information.',
         array(
-      '@project' => 'http://drupal.org/project/facebook_status',
-      '@docs' => 'http://drupal.org/node/421128',
-    )
+	        '@project' => 'http://drupal.org/project/facebook_status',
+	        '@docs' => 'http://drupal.org/node/421128',
+	      )
       );
   }
 }
@@ -599,13 +599,8 @@ function facebook_status_has_status($recipient_id = NULL, $type = 'user', $sende
  * @return
  *   A status object containing sid, sender, recipient, type, created, message.
  */
-function facebook_status_load($sids) {
-  foreach ($sids as $nid => &$sid) {
-    $node_additions = db_fetch_object(db_query("SELECT * FROM {facebook_status} WHERE sid = :sid", array(':sid' => $sid)));
-    foreach ($node_additions as $property => &$value) {
-      $sid->$property = $value;
-    }
-  }
+function facebook_status_load($sid) {
+  return db_query("SELECT * FROM {facebook_status} WHERE sid = :sid", array(':sid' => $sid))->fetchObject();  
 }
 
 /**
@@ -772,7 +767,6 @@ function facebook_status_save_status($recipient, $type, $message, $sender = NULL
   // Pretend to have set a new status if the submitted status is exactly the same as the old one.
   $status = _facebook_status_get_status_fast($sender->uid);
  
-  
   // The status object to be saved.
   $object = (object) array(
     'message' => $message,
@@ -782,7 +776,6 @@ function facebook_status_save_status($recipient, $type, $message, $sender = NULL
     'type' => $type,
   );
    
-  
   if ($message != $status->message || $type != $status->type || $recipient_id != $status->recipient || !$options['discard duplicates']) {
     $edit = FALSE;
     // If a new status is submitted on one's own profile within
@@ -865,7 +858,7 @@ function _facebook_status_run_filter($status) {
  *   A status object.
  */
 function _facebook_status_get_status_fast($uid) {
-  $status = db_query("SELECT * FROM {facebook_status} WHERE sender = :sender AND recipient = :recipient AND type = :type ORDER BY sid DESC", array(':sender' => $uid, ':recipient' => $uid, ':type' => 'user'))->fetchObject;
+  $status = db_query("SELECT * FROM {facebook_status} WHERE sender = :sender AND recipient = :recipient AND type = :type ORDER BY sid DESC", array(':sender' => $uid, ':recipient' => $uid, ':type' => 'user'))->fetchObject();
   if (!$status) {
     $status = (object) array(
       'sender' => $uid,
@@ -923,7 +916,7 @@ function facebook_status_facebook_status_context_info() {
     'user' => array(
       'title' => t('User profiles'),
       'description' => t('If a profile is currently being viewed, then the stream belongs to the owner of that profile.') . ' ' .
-        t('Otherwise, the stream belongs to the current user.'),
+                       t('Otherwise, the stream belongs to the current user.'),
       'handler' => 'facebook_status_user_context',
       'view' => 'facebook_status_stream',
       'weight' => 9999,

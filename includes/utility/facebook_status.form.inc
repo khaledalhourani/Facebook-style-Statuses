@@ -28,7 +28,6 @@
  *     have access to use the form
  */
 function theme_facebook_status_form_display($variables) {
-  dsm($variables);
   $context = $variables['recipient'];
   $type = $variables['type'];
   $view = $variables['view'];
@@ -43,7 +42,6 @@ function theme_facebook_status_form_display($variables) {
   elseif (!empty($type)) {
     $recipient = $context;
     $context = facebook_status_determine_context($type);
-    dsm($context);
   }
   // $type is NULL and $context is not, so $context is a full context array.
   else {
@@ -57,7 +55,9 @@ function theme_facebook_status_form_display($variables) {
   $selectors = module_invoke_all('facebook_status_refresh_selectors', $recipient, $type) + explode("\n", isset($context['selectors']));
   $conversation = (arg(0) == 'statuses' && arg(1) == 'conversation' && $type == 'user');
   
-  $output = '';
+  //$output = '';
+  $output = array();
+  
   if (facebook_status_user_access('add', $recipient, $type, $user)) {
     $self = '';
     if ($type == 'user' && $user->uid == $recipient->uid) {
@@ -67,10 +67,11 @@ function theme_facebook_status_form_display($variables) {
     if ($conversation) {
       $converse = ' facebook-status-conversation-form';
     }
-    $output .= '<div class="clear-block facebook-status-update facebook-status-update-main facebook-status-form-type-' . $type . $self . $converse . '">' .
-      drupal_get_form('facebook_status_box', $recipient, $type) . '</div>';
+    /*$output .= '<div class="clear-block facebook-status-update facebook-status-update-main facebook-status-form-type-' . $type . $self . $converse . '">' .
+      drupal_get_form('facebook_status_box', $recipient, $type) . '</div>';*/
+    $output['#children'] = drupal_get_form('facebook_status_box', $recipient, $type);
+    $output['#wrapper'] = '<div class="clear-block facebook-status-update facebook-status-update-main facebook-status-form-type-' . $type . $self . $converse . '"></div>';
   }
-  
   if ($conversation) {
     $args = explode(',', $arg);
     $count = count($args);
@@ -79,12 +80,14 @@ function theme_facebook_status_form_display($variables) {
         $args[1] = $user->uid;
       }
       $arg = implode(',', $args);
-      $output .= views_embed_view('facebook_status_conversation', 'default', $arg, $arg);
+      //$output .= views_embed_view('facebook_status_conversation', 'default', $arg, $arg);
+      $output['#markup'] = views_embed_view('facebook_status_conversation', 'default', $arg, $arg);
       $selectors[] = '.view-id-facebook_status_conversation';
     }
   }
   elseif (!empty($view)) {
-    $output .= views_embed_view($view, 'default', $context['handler']->recipient_id($recipient), $type);
+    //$output .= views_embed_view($view, 'default', $context['handler']->recipient_id($recipient), $type);
+    $output['#markup'] = views_embed_view($view, 'default', $context['handler']->recipient_id($recipient), $type);
     $selectors[] = '.view-id-' . $view;
   }
   if (!empty($selectors)) {
@@ -93,8 +96,9 @@ function theme_facebook_status_form_display($variables) {
         'refreshIDs' => array_unique($selectors),
       )), array('type' => 'setting', 'scope' => JS_DEFAULT));
   }
-  #return drupal_render($output);
-  return $output;
+  return drupal_render($output);
+  #return $output;
+
 }
 
 /**
@@ -166,20 +170,19 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     }
   }
 
+  
   $path = drupal_get_path('module', 'facebook_status') . '/resources';
   drupal_add_js($path . '/facebook_status.js');
   drupal_add_js($path . '/facebook_status_ahah.js', array('scope' => 'footer'));
   drupal_add_css($path . '/facebook_status.css');
-  $form = array('#cache' => TRUE);
+  
+  
+  //$form = array('#cache' => TRUE);
   //Form elements between ['opendiv'] and ['closediv'] will be refreshed via AHAH on form submission.
-  $form['opendiv'] = array(
-    //***'#value' => '<div id="facebook-status-replace">',
-    '#markup' => '<div id="facebook-status-replace">',
-    '#weight' => -50,
-  );
+  $form = array();
+  
   if (!empty($intro)) {
     $form['intro'] = array(
-      //***'#markup' => '<span class="facebook-status-intro">' . $intro . '</span>',
       '#markup' => '<span class="facebook-status-intro">' . $intro . '</span>',
       '#weight' => -45,
     );
@@ -191,10 +194,11 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     '#attributes' => array('class' => 'facebook-status-text facebook-status-text-main'),
     '#resizable' => FALSE,
     '#weight' => -40,
+    '#prefix' => '<div id="facebook-status-replace">',
+    '#suffix' => '</div>',
   );
   if (variable_get('facebook_status_length', 140) > 0) {
     $form['chars'] = array(
-      //***'#value' => '<span class="facebook-status-chars">' . t('%chars characters allowed', array('%chars' => variable_get('facebook_status_length', 140))) . '</span>',
       '#markup' => '<span class="facebook-status-chars">' . t('%chars characters allowed', array('%chars' => variable_get('facebook_status_length', 140))) . '</span>',
       '#weight' => -35,
     );
@@ -205,34 +209,23 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     '#submit' => array('facebook_status_box_submit'),
     '#attributes' => array('class' => 'facebook-status-submit'),
     '#weight' => -25,
-  );
-  /*if (variable_get('facebook_status_ahah', 1)) {
-    $form['fbss-submit']['#ahah'] = array(
-      'path' => 'facebook_status/js',
+    '#ajax' => array(
+      'callback' => 'fb_callback',
       'wrapper' => 'facebook-status-replace',
-      'effect' => 'fade',
-      'method' => 'replace',
-    );
-  }*/
+    ),
+  );
   $form['sdefault'] = array(
-    '#type' => 'markup',
-    //'#value' => $default,
+    #'#type' => 'markup',
     '#markup' => $default,
     '#weight' => -10,
   );
-  //Form elements between ['opendiv'] and ['closediv'] will be refreshed via AHAH on form submission.
-  $form['closediv'] = array(
-    //'#value' => '</div>',
-    '#markup' => '</div>',
-    '#weight' => -1,
-  );
   $form['recipient'] = array(
-    '#type' => 'markup',
+    #'#type' => 'markup',
     '#markup' => $context['handler']->recipient_id($recipient),
     '#weight' => 10,
   );
   $form['type'] = array(
-    '#type' => 'markup',
+    #'#type' => 'markup',
     '#markup' => $type,
     '#weight' => 10,
   );
@@ -242,8 +235,14 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
       '#weight' => 20,
     );
   }
-  
   return $form;
+} 
+
+/**
+ * Ajax Callback.
+ */
+function fb_callback($form, $form_state) {
+  return;
 }
 
 /**

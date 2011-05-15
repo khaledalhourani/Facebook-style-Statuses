@@ -22,9 +22,8 @@
  *   FALSE otherwise.
  */
 function facebook_status_user_access_add($recipient = NULL, $type = 'user', $sender = NULL) {
-  global $user;
-  $recipient = (empty($recipient) ? $user : $recipient);
-  $sender = (empty($sender) ? $user : $sender);
+  $recipient = (empty($recipient) ? $GLOBALS['user'] : $recipient);
+  $sender = (empty($sender) ? $GLOBALS['user'] : $sender);
   $context = facebook_status_determine_context($type);
   return $context['handler']->access_add($recipient, $sender);
 }
@@ -118,9 +117,8 @@ function facebook_status_user_access_view($status, $account = NULL) {
  *   otherwise.
  */
 function facebook_status_user_access_view_stream($recipient = NULL, $type = 'user', $account = NULL) {
-  global $user;
-  $account = (empty($account) ? $user : $account);
-  $recipient = (empty($recipient) ? $user : $recipient);
+  $account = (empty($account) ? $GLOBALS['user'] : $account);
+  $recipient = (empty($recipient) ? $GLOBALS['user'] : $recipient);
   $context = facebook_status_determine_context($type);
   return $context['handler']->access_stream($recipient, $account);
 }

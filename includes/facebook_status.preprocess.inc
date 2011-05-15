@@ -58,6 +58,7 @@ function template_preprocess_facebook_status_item(&$vars) {
  * @see facebook_status_show()
  */
 function _facebook_status_show($status, $options) {
+  
   if (!facebook_status_user_access('view', $status)) {
     return;
   }
@@ -66,7 +67,7 @@ function _facebook_status_show($status, $options) {
     'page' => FALSE,
     'cacheable' => FALSE,
   );
-  if ($links) {
+  if (isset($links)) {
     $status->links = module_invoke_all('link', 'facebook_status', $status);
     drupal_alter('facebook_status_link', $status->links, $status);
   }
@@ -82,16 +83,19 @@ function _facebook_status_show($status, $options) {
       $title = t('@sender: @message', array('@sender' => $sender->name, '@message' => $message));
     }
     else {
+     
       $recipient = _facebook_status_user_load($status->recipient);
       //"\xC2\xBB" is the unicode escape sequence for the HTML entity &raquo; (a double right angle bracket)
       $title = t("@sender \xC2\xBB @recipient: @message",
         array('@sender' => $sender->name, '@recipient' => $recipient->name, '@message' => $message)
       );
     }
+    
     if (drupal_strlen($title) > 80) {
       //"\xE2\x80\xA6" is the unicode escape sequence for the HTML entity &hellip; (an ellipsis)
       $title = drupal_substr($title, 0, 79) . "\xE2\x80\xA6";
     }
+
     drupal_set_title($title);
   }
   drupal_add_css(drupal_get_path('module', 'facebook_status') . '/resources/facebook_status.css');

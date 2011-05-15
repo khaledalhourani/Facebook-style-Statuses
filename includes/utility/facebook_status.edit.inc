@@ -8,21 +8,24 @@
 /**
  * The edit status form.
  */
-function facebook_status_edit(&$form_state, $status) {
+function facebook_status_edit($form, &$form_state, $status) {
+  #echo '<pre>'.print_r($status, true).'</pre>'; die();
   $context = facebook_status_determine_context($status->type);
   $maxlength = variable_get('facebook_status_length', 140);
   $path = drupal_get_path('module', 'facebook_status') . '/resources';
-  drupal_add_js($path . '/facebook_status.js');
+  //drupal_add_js($path . '/facebook_status.js');
   drupal_add_css($path . '/facebook_status.css');
   $intro = _facebook_status_get_edit_intro($status, $context);
   $self = '';
-  if ($type == 'user' && $status->sender == $status->recipient) {
+  if ($status->type == 'user' && $status->sender == $status->recipient) {
     $self = ' facebook-status-form-self-update';
   }
-  $form = array('#cache' => TRUE);
+  //$form = array('#cache' => TRUE);
   $form['intro'] = array(
-    '#value' => '<div class="clear-block facebook-status-update facebook-status-form-type-"' . $status->type . $self . '>' .
-      '<span class="facebook-status-intro">' . $intro . '</span>',
+    '#type' => 'markup',
+    '#markup' => '<span class="facebook-status-intro">' . $intro . '</span>',
+    '#prefix' => '<div class="clear-block facebook-status-update facebook-status-form-type-' . $status->type . $self . '>',
+    '#suffix' => '</div>',
     '#weight' => -45,
   );
   $form['fbss-status'] = array(
@@ -34,11 +37,12 @@ function facebook_status_edit(&$form_state, $status) {
     '#weight' => -40,
   );
   $form['chars'] = array(
-    '#value' => '<span id="facebook-status-chars">' . t('%chars characters allowed', array('%chars' => $maxlength)) . '</span>',
+    '#type' => 'markup',
+    '#markup' => '<span id="facebook-status-chars">' . t('%chars characters allowed', array('%chars' => $maxlength)) . '</span>',
     '#weight' => -38,
   );
   $form['sid'] = array(
-    '#type' => 'value',
+    '#type' => 'hidden',
     '#value' => $status->sid,
     '#weight' => -35,
   );
@@ -46,11 +50,10 @@ function facebook_status_edit(&$form_state, $status) {
     '#type' => 'submit',
     '#value' => t('Save'),
     '#attributes' => array('class' => 'facebook-status-submit'),
-    '#suffix' => '</div>',
     '#weight' => -25,
   );
   //@todo: This is bad. It should be in the CSS but that doesn't seem to be working.
-  $form['#attributes'] = array('style' => 'margin-bottom: 0;');
+  #$form['#attributes'] = array('style' => 'margin-bottom: 0;');
   return $form;
 }
 
@@ -75,16 +78,16 @@ function facebook_status_edit_submit($form, &$form_state) {
   global $user;
   //Pretend to have set a new status if the submitted status is exactly the same as the old one.
   if ($new_status != $status_old->message) {
-    $sql = "UPDATE {facebook_status} SET message = '%s', created = %d WHERE sid = %d";
+    //$sql = "UPDATE {facebook_status} SET message = '%s', created = %d WHERE sid = %d";
     // TODO Please review the conversion of this statement to the D7 database API syntax.
     /* db_query($sql, $new_status, $time, $status_old->sid) */
     db_update('facebook_status')
-  ->fields(array(
-    'message' => $new_status,
-    'created' => $time,
-  ))
-  ->condition('sid', $status_old->sid)
-  ->execute();
+		  ->fields(array(
+		    'message' => $new_status,
+		    'created' => $time,
+		  ))
+		  ->condition('sid', $status_old->sid)
+		  ->execute();
     //Invokes hook_facebook_status_save($status, $edit).
     $status_old->message = $new_status;
     $status_old->created = $time;
@@ -106,7 +109,10 @@ function facebook_status_edit_submit($form, &$form_state) {
  * The delete status confirmation form.
  */
 function _facebook_status_delete($form, &$form_state, $status) {
-  $form['infotext'] = array('#value' => '<p>' . t('Are you sure you want to permanently delete the status %status?', array('%status' => $status->message)) . '</p>');
+  $form['infotext'] = array(
+    '#type' => 'markup',
+    '#markup' => '<p>' . t('Are you sure you want to permanently delete the status %status?', array('%status' => $status->message)) . '</p>'
+  );
   $form['confirm'] = array(
     '#type' => 'submit',
     '#value' => t('Confirm'),
@@ -118,7 +124,7 @@ function _facebook_status_delete($form, &$form_state, $status) {
     '#submit' => array('_facebook_status_delete_cancel'),
   );
   $form['status-sid'] = array(
-    '#type' => 'value',
+    '#type' => 'hidden',
     '#value' => $status->sid,
   );
   return $form;
@@ -144,7 +150,7 @@ function _facebook_status_delete_confirm($form, &$form_state) {
  */
 function _facebook_status_delete_cancel($form, &$form_state) {
   $status = facebook_status_load($form_state['values']['status-sid']);
-  if ($_GET['destination']) {
+  if (isset($_GET['destination'])) {
     $form_state['redirect'] = $_GET['destination'];
   }
   else {

@@ -8,7 +8,7 @@
 /**
  * Settings form.
  */
-function facebook_status_admin($form_state) {
+function facebook_status_admin($form, &$form_state) {
   $form['facebook_status_length'] = array(
     '#type' => 'textfield',
     '#title' => t('Maximum status length'),
@@ -72,7 +72,7 @@ function facebook_status_admin_validate($form, &$form_state) {
 /**
  * Advanced settings form.
  */
-function facebook_status_admin_advanced($form_state) {
+function facebook_status_admin_advanced($form, &$form_state) {
   $form['facebook_status_box_rows'] = array(
     '#type' => 'textfield',
     '#title' => t('Status update box rows'),
@@ -169,8 +169,9 @@ function facebook_status_admin_advanced_validate($form, &$form_state) {
 /**
  * The draggable-table stream context configuration form.
  */
-function facebook_status_admin_contexts(&$form_state) {
+function facebook_status_admin_contexts($form, &$form_state) {
   $data = facebook_status_all_contexts();
+  
   $form = array();
   $form['components'] = array();
   $form['components']['#tree'] = TRUE;
@@ -178,16 +179,17 @@ function facebook_status_admin_contexts(&$form_state) {
   $views = views_get_all_views();
   $options = array('' => t('None'));
   foreach ($views as $name => $view) {
-    if (empty($view->disabled)) {
+    //if (empty($view->disabled)) {
+    if (!isset($view->disabled) || $view->disabled != TRUE) {
       $options[$name] = $name;
     }
   }
   foreach ($data as $type => $values) {
     $form['components'][$type]['title'] = array(
-      '#prefix' => '<div title="' . (isset($values['description']) ? $values['description'] : '') . '">',
+      //'#prefix' => '<div title="' . (isset($values['description']) ? $values['description'] : '') . '">',
       //'#value' => $values['title'],
       '#markup' => $values['title'],
-      '#suffix' => '</div>',
+      //'#suffix' => '</div>',
     );
     $form['components'][$type]['view'] = array(
       '#type' => 'select',
@@ -211,7 +213,7 @@ function facebook_status_admin_contexts(&$form_state) {
     $form['components'][$type]['already_saved'] = array(
       '#type' => 'hidden',
       //'#value' => isset($values['in_db']) ? $values['in_db'] : FALSE,
-      '#markup' => isset($values['in_db']) ? $values['in_db'] : FALSE,
+      '#value' => isset($values['in_db']) ? $values['in_db'] : FALSE,
     );
   }
   $form['submit'] = array(
@@ -251,22 +253,16 @@ function theme_facebook_status_admin_contexts($variables) {
   $rows = array();
   foreach (element_children($form['components']) as $key) {
     $element = &$form['components'][$key];
-    $element['title']['#attributes']['class']         = 'title-group';
-    $element['view']['#attributes']['class']          = 'view-group';
-    $element['selectors']['#attributes']['class']     = 'selectors-group';
-    $element['weight']['#attributes']['class']        = 'weight-group';
-    $element['type']['#attributes']['class']          = 'type';
-    $element['already_saved']['#attributes']['class'] = 'already-saved';
     $row = array();
-    $row[] = drupal_render($element['title']);
-    $row[] = drupal_render($element['view']);
-    $row[] = drupal_render($element['selectors']);
-    $row[] = drupal_render($element['weight']);
-    $row[] = drupal_render($element['type']);
-    $row[] = drupal_render($element['already_saved']);
+    $row[] = drupal_render($element['title'], array('#attributes' => array('class' => 'title-group')));
+    $row[] = drupal_render($element['view'], array('#attributes' => array('class' => 'view-group')));
+    $row[] = drupal_render($element['selectors'], array('#attributes' => array('class' => 'selectors-group')));
+    $row[] = drupal_render($element['weight'], array('#attributes' => array('class' => 'weight-group')));
+    $row[] = drupal_render($element['type'], array('#attributes' => array('class' => 'type')));
+    $row[] = drupal_render($element['already_saved'], array('#attributes' => array('class' => 'already-saved')));
     $rows[] = array(
       'data' => $row,
-      'class' => 'draggable',
+      'class' => array('class' => 'draggable'),
     );
   }
   $output = '<p>' .

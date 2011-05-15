@@ -106,10 +106,10 @@ function facebook_status_announce_generate_status($message, $from, $count, $form
     $to = user_load($row->uid);
     //$context['message'] = check_plain($to->name);
     
-    facebook_status_save_status($to, 'user', $message, $from);
-    
     $context['message'] = t('Sending message to @user (@current of @total)',
     array('@user' => $to->name, '@current' => $context['sandbox']['progress'], '@total' => $count));
+    
+    facebook_status_save_status($to, 'user', $message, $from);
     
     $context['results'][] = check_plain($to->name);
     
@@ -151,5 +151,4 @@ function facebook_status_announce_batch_finished($success, $results, $operations
     )
     ));
   }
-  
 }
