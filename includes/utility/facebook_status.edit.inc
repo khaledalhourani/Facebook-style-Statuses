@@ -9,7 +9,6 @@
  * The edit status form.
  */
 function facebook_status_edit($form, &$form_state, $status) {
-  #echo '<pre>'.print_r($status, true).'</pre>'; die();
   $context = facebook_status_determine_context($status->type);
   $maxlength = variable_get('facebook_status_length', 140);
   //$path = drupal_get_path('module', 'facebook_status') . '/resources';
@@ -20,20 +19,18 @@ function facebook_status_edit($form, &$form_state, $status) {
   if ($status->type == 'user' && $status->sender == $status->recipient) {
     $self = ' facebook-status-form-self-update';
   }
-  $form = array();
-  //$form = array('#cache' => TRUE);
+  #$form = array('#cache' => TRUE);
   $form['intro'] = array(
     '#type' => 'markup',
     '#markup' => '<span class="facebook-status-intro">' . $intro . '</span>',
-    //'#prefix' => '<div class="clear-block facebook-status-update facebook-status-form-type-' . $status->type . $self . '>',
-    //'#suffix' => '</div>',
+    '#prefix' => '<div class="clear-block facebook-status-update facebook-status-form-type-' . $status->type . $self . '>',
+    '#suffix' => '</div>',
     '#weight' => -45,
   );
   $form['fbss-status'] = array(
     '#type' => 'textarea',
     '#rows' => variable_get('facebook_status_box_rows', 2),
     '#default_value' => $status->message,
-    '#attributes' => array('class' => 'facebook-status-text'),
     '#resizable' => FALSE,
     '#weight' => -40,
   );
@@ -48,13 +45,10 @@ function facebook_status_edit($form, &$form_state, $status) {
     '#weight' => -35,
   );
   $form['fbss-submit'] = array(
-    '#type' => 'submit',
+    '#type'       => 'submit',
     '#value' => t('Save'),
-    '#attributes' => array('class' => 'facebook-status-submit'),
     '#weight' => -25,
   );
-  //@todo: This is bad. It should be in the CSS but that doesn't seem to be working.
-  #$form['#attributes'] = array('style' => 'margin-bottom: 0;');
   return $form;
 }
 
@@ -79,9 +73,6 @@ function facebook_status_edit_submit($form, &$form_state) {
   global $user;
   //Pretend to have set a new status if the submitted status is exactly the same as the old one.
   if ($new_status != $status_old->message) {
-    //$sql = "UPDATE {facebook_status} SET message = '%s', created = %d WHERE sid = %d";
-    // TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query($sql, $new_status, $time, $status_old->sid) */
     db_update('facebook_status')
 		  ->fields(array(
 		    'message' => $new_status,
@@ -97,6 +88,7 @@ function facebook_status_edit_submit($form, &$form_state) {
   $form_state['redirect'] = empty($_GET['destination']) ? array('statuses/share') : array($_GET['destination']);
   drupal_set_message(t('Status has been successfully edited.'));
   //Trigger integration. Don't call if the status is blank because usually nothing interesting is happening.
+  /* i have to close this out, caus some things aren't implemented correct yet. <---
   if (module_exists('trigger') && !empty($new_status)) {
     $op = 'fbss_edited_' . $status_old->type;
     if ($status_old->type == 'user') {
@@ -104,6 +96,7 @@ function facebook_status_edit_submit($form, &$form_state) {
     }
     module_invoke_all('facebook_status', $op, $status_old, $context);
   }
+   <--- leave !!! */
 }
 
 /**
@@ -138,11 +131,12 @@ function _facebook_status_delete_confirm($form, &$form_state) {
   $status = facebook_status_load($form_state['values']['status-sid']);
   facebook_status_delete_status($status->sid);
   drupal_set_message(t('Status deleted.'));
+  
   if (isset($_GET['destination'])) {
     $form_state['redirect'] = $_GET['destination'];
   }
   else {
-    $form_state['redirect'] = ($status->type == 'user' ? 'user' : '<front>');
+    $form_state['redirect'] = $status->type == 'user' ? 'user' : '<front>';
   }
 }
 
@@ -155,7 +149,7 @@ function _facebook_status_delete_cancel($form, &$form_state) {
     $form_state['redirect'] = $_GET['destination'];
   }
   else {
-    $form_state['redirect'] = ($status->type == 'user' ? 'user' : '<front>');
+    $form_state['redirect'] = $status->type == 'user' ? 'user' : '<front>';
   }
 }
 

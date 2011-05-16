@@ -1,5 +1,8 @@
+(function ($) { $(function() {
+  
 var allowClickRefresh = true;
-Drupal.behaviors.facebookStatus = function (context) {
+Drupal.behaviors.facebookStatus = {
+  attach: function (context, settings) {
   var initialLoad = false;
   // Drupal passes document as context on page load.
   if (context == document) {
@@ -130,7 +133,7 @@ Drupal.behaviors.facebookStatus = function (context) {
                 var insert = new_content.find(val);
                 if (insert.get() != element.get()) {
                   element.replaceWith(insert);
-                  Drupal.attachBehaviors(insert);
+                  //Drupal.attachBehaviors(insert);
                 }
                 loaded[val] = true;
               }
@@ -186,6 +189,7 @@ Drupal.behaviors.facebookStatus = function (context) {
     }, 10);
   });
 }
+}
 // Change remaining character count.
 function fbss_print_remaining(fbss_remaining, where) {
   if (fbss_remaining >= 0) {
@@ -207,3 +211,5 @@ function fbss_print_remaining(fbss_remaining, where) {
 function allowRefresh() {
   allowClickRefresh = !allowClickRefresh;
 }
+
+})})(jQuery);

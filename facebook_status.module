@@ -273,27 +273,21 @@ function facebook_status_permission() {
  */
 function facebook_status_user_cancel($edit, $account, $method) {
   if (TRUE) {
-    // Remove abandoned statuses from the database on user account deletion.
-    // TODO Please review the conversion of this statement to the D7 database API syntax.
     db_query("DELETE FROM {facebook_status} WHERE sender = :uid OR (recipient = :uid AND type = 'user')", array($account->uid));
-    /*db_delete('facebook_status')
-      ->where('sender = %d OR (recipient = %d AND type = ' user ')'  )
-      ->execute();*/
-    // NOTE: modules that integrate with FBSS should implement hook_user()
-    // themselves instead of relying on hook_facebook_status_delete().
-    // Administrators who use the interface to create actions that occur when a
-    // status is deleted should make sure that these actions also occur for a
-    // user's statuses when that user is deleted.
-    // When we upgrade to Drupal 7, we can switch to using the status delete
-    // API function instead of a direct database call by utilizing the Queue
-    // API.
   }
+}
+
+/**
+ * Implements hook_user_delete($account)
+ */
+function facebook_status_user_delete($account) {
+  db_query('DELETE FROM {facebook_status} WHERE sender = :uid', array(':uid' => $account->uid));  
 }
 
 /**
  * Implements hook_user_view().
  */
-function facebook_status_user_view($account, $view_mode) {
+function facebook_status_user_view($account, $view_mode, $langcode) {
   if (TRUE && variable_get('facebook_status_profile', 1)) {
     $value = theme('facebook_status_form_display', array('recipient' => $account, 'type' => 'user'));
     // Don't show this section if there's nothing there or the user doesn't have permission to see it.
@@ -314,7 +308,7 @@ function facebook_status_user_view($account, $view_mode) {
       '#title' => 'Statuses',
       '#markup' => $value,
       '#attributes' => array('class' => 'facebook-status profile'),
-    );
+    ); 
   }
 }
 
@@ -715,15 +709,13 @@ function facebook_status_delete_status($sid) {
     $sid = $sid->sid;
   }
   // Trigger integration.
+  /* i have to close this out, caus some things aren't implemented correct yet. <---
   if (module_exists('trigger')) {
     module_invoke_all('facebook_status', 'fbss_deleted', $sid);
   }
+  <--- leave !!! */
   module_invoke_all('facebook_status_delete', $sid);
-  // TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("DELETE FROM {facebook_status} WHERE sid = %d", $sid) */
-  db_delete('facebook_status')
-    ->condition('sid', $sid)
-    ->execute();
+  db_query('DELETE FROM {facebook_status} WHERE sid = :sid', array(':sid' => $sid));
 }
 
 /**
@@ -988,11 +980,14 @@ function facebook_status_trigger_info() {
  * or
  * Implements hook_trigger_name().
  */
+/*  'facebook_status', 'fbss_deleted', $sid  */
+
 function facebook_status_facebook_status($op, $a1, $context = NULL) {
   if (!in_array($op, array('fbss_deleted', 'fbss_edited')) && strpos($op, 'fbss_submitted') !== 0) {
     return;
   }
   $aids = _trigger_get_hook_aids('facebook_status', $op);
+  print_r($aids); die();
   if ($op == 'fbss_deleted' || $op == 'fbss_edited') {
     $status = facebook_status_load($a1);
   }

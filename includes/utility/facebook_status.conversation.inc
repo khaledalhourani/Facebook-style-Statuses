@@ -41,23 +41,22 @@ function _facebook_status_conversation() {
   
   $count = count($args);
   if ($count > 2 || $count < 1 || ($count == 1 && $args[0] == $user->uid) || !is_numeric($args[0]) || ($count == 2 && !is_numeric($args[1]))) {
-    drupal_not_found();
-    return;
+    return drupal_not_found();
   }
   $key = array_search($user->uid, $args);
   if ($key === FALSE) {
     if ($count === 1) {
       $args[1] = $user->uid;
     }
-    $arg = implode(',', $args);
-    
+    $arg = implode('/', $args);
+    #print_R($arg); die();
     //return views_embed_view('facebook_status_conversation', 'default', $arg, $arg);
-    return views_embed_view('facebook_status_conversation', 'default', $arg, $arg);
+    return views_embed_view('facebook_status_conversation', 'default', $args[0], $args[1]);
   }
   $key = $key ? 0 : 1; //The recipient is not the current user.
   $recipient = _facebook_status_user_load($args[$key]);
   if (facebook_status_user_access('converse') && !empty($recipient->uid)) {
     return theme('facebook_status_form_display', array('recipient' => $recipient, 'type' => 'user'));
   }
-  drupal_not_found();
+  return drupal_not_found();
 }

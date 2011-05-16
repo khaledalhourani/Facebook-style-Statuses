@@ -10,7 +10,7 @@
  */
 //Drupal.ahah.prototype.success = function (response, status) {
   Drupal.behaviors.facebook_status = {
-    attach: function(context, settings) {
+  attach: function(context, settings) {
   var wrapper = $(this.wrapper);
   var form = $(this.element).parents('form');
   // Manually insert HTML into the jQuery object. Using $() directly crashes
