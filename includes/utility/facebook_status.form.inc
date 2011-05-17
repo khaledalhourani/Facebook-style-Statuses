@@ -92,7 +92,7 @@ function theme_facebook_status_form_display($variables) {
         'refreshIDs' => array_unique($selectors),
       )), array('type' => 'setting', 'scope' => JS_DEFAULT));
   }
-  //dsm($build);
+  #dsm($build);
   return $build;
 }
 
@@ -107,7 +107,6 @@ function theme_facebook_status_form_display($variables) {
  *   A $form array.
  */
 function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
-  #dsm($form_state);
   global $user;
   _facebook_status_use_autogrow();
   
@@ -172,11 +171,6 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
       $intro = t('In response to !status', array('!status' => theme('facebook_status_item', array('status' => $status, 'options' => array('links' => FALSE)))));
     }
   }
-  
-  //$path = drupal_get_path('module', 'facebook_status') .'/resources';
-  //drupal_add_js($path .'/facebook_status.js');
-  //drupal_add_js($path .'/facebook_status_ahah.js', 'module', 'footer');
-  //drupal_add_css($path .'/facebook_status.css');
   
   $form['pre'] = array(
     '#type' => 'markup',
