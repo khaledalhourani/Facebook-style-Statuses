@@ -25,7 +25,6 @@ function facebook_status_views_data() {
       'type' => 'INNER',
     ),
   );
-
   // Advertise this table as a possible base table.
   $data['facebook_status']['table']['base'] = array(
     'field' => 'sid',
