@@ -21,7 +21,7 @@
  *   The machine name of the view to display with the form. Overrides the one
  *   requested by the context.
  * @return
- *   HTML to display the status update form, or FALSE if:
+ *   $build Array display the status update form, or FALSE if:
  *   - The current user has no access to both the form and the associated
  *     status messages, OR
  *   - There are no relevant status messages and the current user does not
@@ -178,6 +178,7 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
   );
   if (!empty($intro)) {
     $form['intro'] = array(
+      '#type' => 'markup',
       '#markup' => '<span class="facebook-status-intro">' . $intro . '</span>',
       '#weight' => -45,
     );
@@ -189,12 +190,6 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     '#weight' => -40,
     '#attributes' => array('class' => array('facebook-status-text facebook-status-text-main')), 
   );
-  if (variable_get('facebook_status_length', 140) > 0) {
-    $form['chars'] = array(
-      '#markup' => '<span class="facebook-status-chars">' . t('%chars characters allowed', array('%chars' => variable_get('facebook_status_length', 140))) . '</span>',
-      '#weight' => -35,
-    );
-  }
   $form['recipient'] = array(
     '#type' => 'hidden',
     '#value' => $context['handler']->recipient_id($recipient),
@@ -222,12 +217,10 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
       'method' => 'replace',
     ),*/
   );
-  
   $form['after'] = array(
     '#type' => 'markup',
     '#markup' => '</div>'
   );
-  
   if (arg(0) == 'statuses' && arg(1) == 'share' && !empty($_GET['destination']) && $_GET['destination'] != $_GET['q']) {
     $form['back'] = array(
       '#markup' => l(t('Back'), $_GET['destination'], array('attributes' => array('class' => 'facebook-status-back'))),
@@ -241,20 +234,12 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
  * Validate function for the status update form.
  */
 function facebook_status_box_validate($form, &$form_state) {
-  $maxlen = variable_get('facebook_status_length', 140);
-  $len = drupal_strlen($form_state['values']['fbss-status']);
-  if ($len > $maxlen && $maxlen != 0) {
-    form_set_error('status',
-      t('You may use a maximum of %maxchars characters, but you are using %chars characters.',
-      array('%maxchars' => $maxlen, '%chars' => $len)));
-  }
 }
 
 /**
  * Submit function for the status update form.
  */
 function facebook_status_box_submit($form, &$form_state) {
-  dsm($form_state);
   $type = $form_state['values']['type'];
   $rid = $form_state['values']['recipient'];
   $context = facebook_status_determine_context($type);
@@ -272,10 +257,6 @@ function facebook_status_box_submit($form, &$form_state) {
   $form_state['facebook_status']['type'] = $type;
   $form_state['facebook_status']['recipient'] = $rid;
   $form_state['rebuild'] = TRUE;
-  /*if (!variable_get('facebook_status_ahah', 1)) {
-    $form_state['redirect'] = array($_GET['q']);
-    $form_state['rebuild'] = FALSE;
-  }*/
 }
 
 /**

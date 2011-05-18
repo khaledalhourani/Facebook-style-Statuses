@@ -92,7 +92,6 @@ function facebook_status_announce_generate_status($message, $from, $count, $form
   }
   $limit = $count;
   
-
   $result = db_select('users', 'uid')
     ->fields('uid')
     ->condition('uid', $context['sandbox']['current_userid'], '>')

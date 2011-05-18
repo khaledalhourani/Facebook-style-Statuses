@@ -12,7 +12,6 @@ files[] = includes/facebook_status.preprocess.inc
 files[] = includes/ctools/content_types/facebook_status_stream.inc
 files[] = utility/facebook_status.access.inc
 files[] = utility/facebook_status.admin.inc
-#files[] = utility/facebook_status.ahah.inc
 files[] = utility/facebook_status.announce.inc
 files[] = utility/facebook_status.contexts.inc
 files[] = utility/facebook_status.conversation.inc

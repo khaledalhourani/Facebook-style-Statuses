@@ -10,7 +10,6 @@
  */
 function facebook_status_edit($form, &$form_state, $status) {
   $context = facebook_status_determine_context($status->type);
-  $maxlength = variable_get('facebook_status_length', 140);
   //$path = drupal_get_path('module', 'facebook_status') . '/resources';
   //drupal_add_js($path . '/facebook_status.js');
   //drupal_add_css($path . '/facebook_status.css');
@@ -33,11 +32,6 @@ function facebook_status_edit($form, &$form_state, $status) {
     '#default_value' => $status->message,
     '#resizable' => FALSE,
     '#weight' => -40,
-  );
-  $form['chars'] = array(
-    '#type' => 'markup',
-    '#markup' => '<span id="facebook-status-chars">' . t('!chars characters allowed', array('!chars' => $maxlength)) . '</span>',
-    '#weight' => -38,
   );
   $form['sid'] = array(
     '#type' => 'hidden',

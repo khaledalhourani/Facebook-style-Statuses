@@ -312,7 +312,6 @@ function facebook_status_user_view($account, $view_mode, $langcode) {
   }
 }
 
-
 /**
  * Implements hook_init().
  */
