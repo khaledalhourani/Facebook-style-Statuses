@@ -93,7 +93,7 @@ function theme_facebook_status_form_display($variables) {
       )), array('type' => 'setting', 'scope' => JS_DEFAULT));
   }
   #dsm($build);
-  return $build;
+  return drupal_render($build);
 }
 
 /**

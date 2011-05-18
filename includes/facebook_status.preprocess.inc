@@ -11,7 +11,7 @@ function template_preprocess_facebook_status_item(&$vars) {
   $vars['context'] = $context;
   $vars['sid'] = $status->sid;
   $vars['self'] = $status->type == 'user' && $status->sender == $status->recipient;
-  $vars['page'] = $options['page'];
+  $vars['page'] = isset($options['page']);
   $vars['type'] = $status->type;
   $vars['message'] = _facebook_status_run_filter($status->message);
   if (variable_get('facebook_status_nl2br', 0)) {
@@ -34,7 +34,7 @@ function template_preprocess_facebook_status_item(&$vars) {
   $vars['sender_name'] = check_plain($vars['sender']->name);
   $vars['sender_link'] = theme('username', array('account' => $vars['sender']));
   $vars['sender_picture'] = theme('user_picture', array('account' => $vars['sender']));
-  if ($options['cacheable']) {
+  if (isset($options['cacheable'])) {
     $vars['created'] = format_date($status->created, 'short');
   }
   else {
@@ -72,7 +72,7 @@ function _facebook_status_show($status, $options) {
     drupal_alter('facebook_status_link', $status->links, $status);
   }
   $message = trim($status->message);
-  if ($options['page']) {
+  if (isset($options['page'])) {
     $title = '';
     if (empty($message)) {
       drupal_not_found();
