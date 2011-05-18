@@ -363,7 +363,7 @@ function facebook_status_views_default_views() {
   $view->view_php = '';
   $view->base_table = 'facebook_status';
   $view->is_cacheable = FALSE;
-  $view->api_version = 2;
+  $view->api_version = 3;
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
   $handler->override_option('fields', array(
@@ -712,7 +712,7 @@ function facebook_status_views_default_views() {
   $view->view_php = '';
   $view->base_table = 'facebook_status';
   $view->is_cacheable = FALSE;
-  $view->api_version = 2;
+  $view->api_version = 3;
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
   $handler = $view->new_display('default', 'Defaults', 'default');
   $handler->override_option('fields', array(
