@@ -92,7 +92,6 @@ function theme_facebook_status_form_display($variables) {
         'refreshIDs' => array_unique($selectors),
       )), array('type' => 'setting', 'scope' => JS_DEFAULT));
   }
-  #dsm($build);
   return drupal_render($build);
 }
 
@@ -145,7 +144,6 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
   //@todo: Replace with a "true" re-posting system.
   if (isset($_GET['sid']) && is_numeric($_GET['sid'])) {
     $rs = facebook_status_load($_GET['sid']);
-    
     $sender = user_load($rs->sender);
     if ($sender->uid != $user->uid && $rs->message) {
       $name = '@' . $sender->name;
@@ -169,7 +167,7 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
         }
         $default = $name;
       }
-      $intro = t('In response to !status', array('!status' => theme('facebook_status_item', array('status' => $status, 'options' => array('links' => FALSE)))));
+      $intro = t('In response to !status', array('!status' => theme('facebook_status_item', array('status' => $status, 'options' => array('links' => FALSE)))));  
     }
   }
   
@@ -220,11 +218,12 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
   );
   $form['after'] = array(
     '#type' => 'markup',
-    '#markup' => '</div>'
+    '#markup' => '</div>',
   );
   if (arg(0) == 'statuses' && arg(1) == 'share' && !empty($_GET['destination']) && $_GET['destination'] != $_GET['q']) {
     $form['back'] = array(
-      '#markup' => l(t('Back'), $_GET['destination'], array('attributes' => array('class' => 'facebook-status-back'))),
+      '#type' => 'markup',
+      '#markup' => l(t('Back'), $_GET['destination'], array('attributes' => array('class' => 'facebook-status-back'), 'html' => 'true')),
       '#weight' => 20,
     );
   }

@@ -11,7 +11,7 @@ function template_preprocess_facebook_status_item(&$vars) {
   $vars['context'] = $context;
   $vars['sid'] = $status->sid;
   $vars['self'] = $status->type == 'user' && $status->sender == $status->recipient;
-  $vars['page'] = isset($options['page']);
+  $vars['page'] = isset($options['page']) ? $options['page'] : '';
   $vars['type'] = $status->type;
   $vars['message'] = _facebook_status_run_filter($status->message);
   if (variable_get('facebook_status_nl2br', 0)) {
@@ -47,8 +47,8 @@ function template_preprocess_facebook_status_item(&$vars) {
     elseif (!empty($vars['recipient_name'])) {
       $vars['meta'] = t('Posted on %entity', array('%entity' => $vars['recipient_name']));
     }
-    if ($options['links']) {
-      $vars['links'] = !empty($status->links) ? theme('links', array('links' => $node->links, 'attributes' => array('class' => 'links inline'))) : '';
+    if (isset($options['links'])) {
+      $vars['links'] = !empty($status->links) ? theme('links', array('links' => $node->links, 'attributes' => array('class' => array('links inline')))) : '';
     }
   }
 }
