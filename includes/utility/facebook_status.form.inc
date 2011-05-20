@@ -77,7 +77,7 @@ function theme_facebook_status_form_display($variables) {
       if (count($args) === 1) {
         $args[1] = $user->uid;
       }
-      $arg = implode(',', $args);
+      //$arg = implode(',', $args);
       $build['view']['#markup'] = views_embed_view('facebook_status_conversation', 'default', $args[0], $args[1]);
       $selectors[] = '.view-id-facebook_status_conversation';
     }
@@ -126,7 +126,6 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     $recipient = $context['handler']->find_recipient();
     $rid = $context['handler']->recipient_id($recipient);
   }
-  
   $default = variable_get('facebook_status_default_text', '');
   $intro = '';
   if (arg(0) == 'statuses' && arg(1) == 'share') {
@@ -140,7 +139,6 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
   elseif (isset($_GET['share-status'])) {
     $default = $_GET['share-status'];
   }
-  
   //@todo: Replace with a "true" re-posting system.
   if (isset($_GET['sid']) && is_numeric($_GET['sid'])) {
     $rs = facebook_status_load($_GET['sid']);
@@ -171,10 +169,6 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     }
   }
   
-  $form['pre'] = array(
-    '#type' => 'markup',
-    '#markup' => '<div id="facebook-status-replace">',
-  );
   if (!empty($intro)) {
     $form['intro'] = array(
       '#type' => 'markup',
@@ -188,6 +182,8 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     '#default_value' => $default,
     '#weight' => -40,
     '#attributes' => array('class' => array('facebook-status-text facebook-status-text-main')), 
+    '#prefix' => '<div id="facebook-status-replace">',
+    '#suffix' => '</div>',
   );
   $form['recipient'] = array(
     '#type' => 'hidden',
@@ -213,12 +209,8 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     /*'#ajax' => array(
       'callback' => 'fb_callback',
       'wrapper' => 'facebook-status-replace',
-      'method' => 'replace',
+      #'method' => 'replace',
     ),*/
-  );
-  $form['after'] = array(
-    '#type' => 'markup',
-    '#markup' => '</div>',
   );
   if (arg(0) == 'statuses' && arg(1) == 'share' && !empty($_GET['destination']) && $_GET['destination'] != $_GET['q']) {
     $form['back'] = array(

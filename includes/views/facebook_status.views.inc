@@ -251,7 +251,7 @@ function facebook_status_views_data() {
     'argument' => array(
       'field' => 'sender',
       'handler' => 'facebook_status_views_handler_argument_participant',
-      'label' => t('User is participant'),
+      'label' => t('User is sender'),
     ),
   );
 

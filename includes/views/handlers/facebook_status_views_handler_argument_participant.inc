@@ -9,25 +9,16 @@
  * Argument handler to select statuses where a given user is a participant.
  */
 class facebook_status_views_handler_argument_participant extends views_handler_argument {
-  /*
-  function query() {
-    $argument = $this->argument;
-    $this->query->add_where(0, "($this->table.sender = :d OR $this->table.recipient = :d) AND $this->table.type = 'user'", array(':d' => $argument));
-  }
-  
   
   function query() {
     $this->ensure_my_table();
-    if (isset($definition['field'])) {
-      $this->real_field = $definition['field'];
-    }
-    $placeholder = $this->definition['numeric'];
-    $argument = $this->argument;
-    $this->query->add_where(0, "$this->table_alias.$this->real_field = $placeholder", $argument);
+    #echo '<pre>'.print_r($this, true).'</pre>'; die();
+    $xx[] = $this->view->args;
+    $arg1 = $xx[0][0];
+    $arg2 = $xx[0][1];
+    $operator = '=';
+    // views_plugin_query_default.inc - line 844
+    $this->query->add_where_expression(0, "($this->table_alias.sender $operator $arg1 AND $this->table_alias.recipient $operator $arg2) OR ($this->table_alias.sender $operator $arg2 AND $this->table_alias.recipient $operator $arg1)", array());
   }
-  */
-  
-  
-  
-  
+
 }
