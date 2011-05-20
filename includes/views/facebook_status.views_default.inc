@@ -1017,6 +1017,7 @@ function facebook_status_views_default_views() {
       'field' => 'message',
       'relationship' => 'none',
     ),
+    /*
     'auto-type' => array(
       'operator' => '=',
       'value' => '',
@@ -1031,6 +1032,7 @@ function facebook_status_views_default_views() {
       'field' => 'auto-type',
       'relationship' => 'none',
     ),
+    */
   ));
   $handler->override_option('access', array(
     'type' => 'permission',
