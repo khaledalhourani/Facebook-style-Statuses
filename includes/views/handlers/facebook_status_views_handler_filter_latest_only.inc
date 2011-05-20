@@ -20,7 +20,7 @@ class facebook_status_views_handler_filter_latest_only extends views_handler_fil
     if ($this->value) {
       $this->ensure_my_table();
       $subquery = "(SELECT MAX(sid) FROM {facebook_status} WHERE sender = recipient AND type = 'user' GROUP BY recipient)";
-      $this->query->add_where(0, db_prefix_tables("$this->table_alias.sid IN $subquery"));
+      $this->query->add_where_expression(0, db_prefix_tables("$this->table_alias.sid IN $subquery"));
     }
   }
 }

@@ -38,10 +38,20 @@ class facebook_status_views_handler_argument_flagged_user extends views_handler_
       '#required' => TRUE,
     );
   }
+  
+  function query() {
+    $argument = $this->argument;
+    $field = "$this->table.$this->real_field";
+    $query = db_prefix_tables("$field IN (SELECT content_id FROM {flag_content} WHERE fid = :d AND uid = :d) OR $field = :d");
+    $this->query->add_where_expression(0, $query, $this->options['facebook_status_flag_type'], array(':d' => $argument));
+  }
+  
+  /*
   function query() {
     $argument = $this->argument;
     $field = "$this->table.$this->real_field";
     $query = db_prefix_tables("$field IN (SELECT content_id FROM {flag_content} WHERE fid = %d AND uid = %d) OR $field = %d");
     $this->query->add_where(0, $query, $this->options['facebook_status_flag_type'], $argument, $argument);
   }
+  */
 }
