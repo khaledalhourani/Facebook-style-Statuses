@@ -21,13 +21,15 @@ class facebook_status_views_handler_filter_own extends views_handler_filter_bool
   function query() {
     if ($this->value) {
       $this->ensure_my_table();
-  
+      
+      $this->query->add_where_expression(0, "($this->table_alias.type = 'user' AND $this->table_alias.sender = $this->table_alias.recipient)");
+      
+      /*
 	    if (isset($definition['field'])) {
 	      $this->real_field = $definition['field'];
 	    }
-      
       $this->query->add_where(0, $this->real_field);
-      
+      */
     }
   }
 }

@@ -20,12 +20,7 @@ class facebook_status_views_handler_filter_not_own extends views_handler_filter_
     if ($this->value) {
       $this->ensure_my_table();
       
-      if (isset($definition['field'])) {
-	      $this->real_field_ = $definition['field'];
-	    }
-      $this->query->add_where(0, $this->real_field);
-      
-      //$this->query->add_where("$this->table_alias.type <> 'user' OR $this->table_alias.sender <> $this->table_alias.recipient");
+      $this->query->add_where_expression("$this->table_alias.type <> 'user' OR $this->table_alias.sender <> $this->table_alias.recipient");
     }
   }
 }
