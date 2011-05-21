@@ -702,353 +702,130 @@ function facebook_status_views_default_views() {
   $handler->override_option('style_plugin', 'table');
   $views[$view->name] = $view;
 
+
   /*
-   * View 'facebook_status_stream'
+   * View 'facebook_status_mystream'
    */
   $view = new view;
-  $view->name = 'facebook_status_stream';
-  $view->description = 'Displays status updates that match the current recipient context.';
-  $view->tag = 'Facebook-style Statuses';
-  $view->view_php = '';
+  $view->name = 'facebook_status_mystream';
+  $view->description = '';
+  $view->tag = 'default';
   $view->base_table = 'facebook_status';
-  $view->is_cacheable = FALSE;
-  $view->api_version = 3;
+  $view->human_name = 'facebook_status_mystream';
+  $view->core = 7;
+  $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
-  $handler = $view->new_display('default', 'Defaults', 'default');
-  $handler->override_option('fields', array(
-    'picture' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'exclude' => 1,
-      'id' => 'picture',
-      'table' => 'users',
-      'field' => 'picture',
-      'relationship' => 'none',
-    ),
-    'name' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'link_to_user' => 1,
-      'overwrite_anonymous' => 0,
-      'anonymous_text' => '',
-      'exclude' => 1,
-      'id' => 'name',
-      'table' => 'users',
-      'field' => 'name',
-      'relationship' => 'none',
-    ),
-    'message' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'exclude' => 1,
-      'id' => 'message',
-      'table' => 'facebook_status',
-      'field' => 'message',
-      'relationship' => 'none',
-    ),
-    'edit' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'exclude' => 1,
-      'id' => 'edit',
-      'table' => 'facebook_status',
-      'field' => 'edit',
-      'relationship' => 'none',
-    ),
-    'delete' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'exclude' => 1,
-      'id' => 'delete',
-      'table' => 'facebook_status',
-      'field' => 'delete',
-      'relationship' => 'none',
-    ),
-    'respond' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'exclude' => 1,
-      'id' => 'respond',
-      'table' => 'facebook_status',
-      'field' => 'respond',
-      'relationship' => 'none',
-    ),
-    'repost' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'repost_text' => 'Share',
-      'exclude' => 1,
-      'id' => 'repost',
-      'table' => 'facebook_status',
-      'field' => 'repost',
-      'relationship' => 'none',
-    ),
-    'created' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'date_format' => 'themed',
-      'custom_date_format' => '',
-      'exclude' => 1,
-      'id' => 'created',
-      'table' => 'facebook_status',
-      'field' => 'created',
-      'relationship' => 'none',
-    ),
-    'nothing' => array(
-      'label' => '',
-      'alter' => array(
-        'text' => '<div>[picture] [name] [message]</div>
 
-<div>[created] [edit] [delete] [respond] [repost]</div>',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 0,
-      'empty_zero' => 0,
-      'exclude' => 0,
-      'id' => 'nothing',
-      'table' => 'views',
-      'field' => 'nothing',
-      'relationship' => 'none',
-    ),
-  ));
-  $handler->override_option('sorts', array(
-    'created' => array(
-      'order' => 'DESC',
-      'id' => 'created',
-      'table' => 'facebook_status',
-      'field' => 'created',
-      'relationship' => 'none',
-    ),
-    'sid' => array(
-      'order' => 'DESC',
-      'id' => 'sid',
-      'table' => 'facebook_status',
-      'field' => 'sid',
-      'relationship' => 'none',
-    ),
-  ));
-  $handler->override_option('filters', array(
-    'message' => array(
-      'operator' => '!=',
-      'value' => '',
-      'group' => '0',
-      'exposed' => FALSE,
-      'expose' => array(
-        'operator' => FALSE,
-        'label' => '',
-      ),
-      'case' => 1,
-      'id' => 'message',
-      'table' => 'facebook_status',
-      'field' => 'message',
-      'relationship' => 'none',
-    ),
-    /*
-    'auto-type' => array(
-      'operator' => '=',
-      'value' => '',
-      'group' => '0',
-      'exposed' => FALSE,
-      'expose' => array(
-        'operator' => FALSE,
-        'label' => '',
-      ),
-      'id' => 'auto-type',
-      'table' => 'facebook_status',
-      'field' => 'auto-type',
-      'relationship' => 'none',
-    ),
-    */
-  ));
-  $handler->override_option('access', array(
-    'type' => 'permission',
-    'permission' => 'view all statuses',
-  ));
-  $handler->override_option('cache', array(
-    'type' => 'none',
-  ));
-  $handler->override_option('use_ajax', TRUE);
-  $handler->override_option('use_pager', '1');
-  $handler->override_option('style_plugin', 'table');
-  $handler = $view->new_display('block', 'Block', 'block_1');
-  $handler->override_option('use_pager', 'mini');
-  $handler->override_option('block_description', 'Facebook-style Statuses: Context-sensitive stream');
-  $handler->override_option('block_caching', -1);
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['row_plugin'] = 'fields';
+  /* Field: Facebook-style Statuses: Status ID */
+  $handler->display->display_options['fields']['sid']['id'] = 'sid';
+  $handler->display->display_options['fields']['sid']['table'] = 'facebook_status';
+  $handler->display->display_options['fields']['sid']['field'] = 'sid';
+  $handler->display->display_options['fields']['sid']['label'] = '';
+  $handler->display->display_options['fields']['sid']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['sid']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['sid']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['sid']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['sid']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['sid']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['sid']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['sid']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['sid']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['sid']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['sid']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['sid']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['sid']['element_label_colon'] = 0;
+  $handler->display->display_options['fields']['sid']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['sid']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['sid']['empty_zero'] = 0;
+  /* Field: Facebook-style Statuses: Status message */
+  $handler->display->display_options['fields']['message']['id'] = 'message';
+  $handler->display->display_options['fields']['message']['table'] = 'facebook_status';
+  $handler->display->display_options['fields']['message']['field'] = 'message';
+  $handler->display->display_options['fields']['message']['label'] = '';
+  $handler->display->display_options['fields']['message']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['message']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['message']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['message']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['message']['element_label_colon'] = 0;
+  $handler->display->display_options['fields']['message']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['message']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['message']['empty_zero'] = 0;
+  /* Field: User: Created date */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'users';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  $handler->display->display_options['fields']['created']['label'] = '';
+  $handler->display->display_options['fields']['created']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['created']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['created']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['created']['element_label_colon'] = 0;
+  $handler->display->display_options['fields']['created']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['created']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['created']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['created']['date_format'] = 'long';
+  /* Field: Facebook-style Statuses: Users with Pictures */
+  $handler->display->display_options['fields']['user_contextual_pic']['id'] = 'user_contextual_pic';
+  $handler->display->display_options['fields']['user_contextual_pic']['table'] = 'facebook_status';
+  $handler->display->display_options['fields']['user_contextual_pic']['field'] = 'user_contextual_pic';
+  $handler->display->display_options['fields']['user_contextual_pic']['label'] = '';
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['element_label_colon'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['user_contextual_pic']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['empty_zero'] = 0;
+  /* Filter criterion: Facebook-style Statuses: Only own statuses */
+  $handler->display->display_options['filters']['only_own']['id'] = 'only_own';
+  $handler->display->display_options['filters']['only_own']['table'] = 'facebook_status';
+  $handler->display->display_options['filters']['only_own']['field'] = 'only_own';
+  $handler->display->display_options['filters']['only_own']['value'] = '1';
+  $translatables['facebook_status_mystream'] = array(
+    t('Master'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+  );
   $views[$view->name] = $view;
+  
 
   return $views;
 }

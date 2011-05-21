@@ -10,8 +10,6 @@
   * Implements hook_install().
   */
 function facebook_status_install() {
-  // TODO The drupal_(un)install_schema functions are called automatically in D7.
-  // drupal_install_schema('facebook_status')
 }
  
 
@@ -116,8 +114,6 @@ function facebook_status_schema() {
  * Implements hook_uninstall().
  */
 function facebook_status_uninstall() {
-  // TODO The drupal_(un)install_schema functions are called automatically in D7.
-  // drupal_uninstall_schema('facebook_status')
   
   db_drop_table('facebook_status');
   db_drop_table('facebook_contexts');
@@ -134,5 +130,4 @@ function facebook_status_uninstall() {
   variable_del('facebook_status_length');
   variable_del('facebook_status_repost');
   variable_del('facebook_status_nl2br');
-  variable_del('facebook_status_ahah');
 }

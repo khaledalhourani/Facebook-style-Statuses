@@ -91,11 +91,6 @@ function facebook_status_tags_block_save($delta, $edit) {
 }
 
 /**
- * Implements hook_block().
- */
-function facebook_status_tags_block_OLD($op = 'list', $delta = 0, $edit = NULL) { }
-
-/**
  * The validate function for the settings on the block form.
  */
 function facebook_status_tags_block_validate($form, &$form_state) {
@@ -110,6 +105,7 @@ function facebook_status_tags_block_validate($form, &$form_state) {
  */
 function facebook_status_tags_form_facebook_status_admin_alter(&$form, &$form_state) {
   if (module_exists('taxonomy')) {
+    #print variable_get('facebook_status_tags_vid'); die();
     if (variable_get('facebook_status_tags_vid', -1) == -1) {
       drupal_set_message(
         t('You have the Taxonomy and Facebook-style Statuses Tags modules enabled, but you have not set them up to work together!') . ' ' .
@@ -118,8 +114,9 @@ function facebook_status_tags_form_facebook_status_admin_alter(&$form, &$form_st
     }
     $options = array('-1' => t('None'));
     $vocabularies = taxonomy_get_vocabularies();
+    //dsm($vocabularies);
     foreach ($vocabularies as $vocabulary) {
-      if ($vocabulary->tags) {
+      if (isset($vocabulary->name)) {
         $options[$vocabulary->vid] = check_plain($vocabulary->name);
       }
     }
@@ -218,6 +215,7 @@ function theme_facebook_status_popular_tags($variables) {
  *   An array of status objects.
  */
 function facebook_status_tags_get_statuses($tag, $type = 'term', $count = 1, $sender = 0) {
+  print $tag . '<br>' . $type . '<br>' . $count . '<br>' .$sender; die();
   $params = array($tag, $type);
   if (is_int($tag)) {
     $rid = 'rid = %d';
@@ -251,7 +249,7 @@ function facebook_status_tags_get_statuses($tag, $type = 'term', $count = 1, $se
     $result = db_query($sql, $params);
   }
   $statuses = array();
-  while ($sid = db_fetch_object($result)) {
+  while ($sid = $result->fetchObject()) {
     $statuses[] = facebook_status_load($sid->sid);
   }
   return $statuses;
@@ -329,7 +327,7 @@ function facebook_status_tags_status_has_tag_by_name($sid, $tag, $type = 'term')
 function facebook_status_tags_get_status_tags($sid, $type = 'term') {
   $result = db_query("SELECT rid FROM {facebook_status_tags} WHERE sid = :sid AND type = :type", array(':sid' => $sid, ':type' => $type));
   $rids = array();
-  while ($rid = db_fetch_object($result)) {
+  while ($rid = $result->fetchObject()) {
     if ($type == 'term') {
       $rids[] = taxonomy_term_load($rid->rid);
     }
@@ -596,7 +594,7 @@ function _facebook_status_tags_resolve($term) {
  * Gets a taxonomy term by name.
  */
 function _facebook_status_tags_get_term($name) {
-  return db_fetch_object(db_query("SELECT tid, name FROM {taxonomy_term_data} WHERE LOWER(name) = :LOWER(name) AND vid = :vid", array(':LOWER(name)' => LOWER('%s'), ':vid' => $name, '' => variable_get('facebook_status_tags_vid', - 1))));
+  return db_query("SELECT tid, name FROM {taxonomy_term_data} WHERE LOWER(name) = :LOWER(name) AND vid = :vid", array(':LOWER(name)' => LOWER('%s'), ':vid' => $name, '' => variable_get('facebook_status_tags_vid', - 1)))->fetchObject();
 }
 
 //===================
@@ -682,7 +680,7 @@ function facebook_status_tags_facebook_status_delete($sid) {
  */
 function facebook_status_tags_views_api() {
   return array(
-    'api' => 2,
+    'api' => 3,
     'path' => drupal_get_path('module', 'facebook_status_tags') . '/views',
   );
 }
@@ -707,9 +705,9 @@ function facebook_status_tags_taxonomy($op, $type, $array = NULL) {
     // TODO Please review the conversion of this statement to the D7 database API syntax.
     /* db_query("DELETE FROM {facebook_status_tags} WHERE rid = %d AND type = 'term'", $array['tid']) */
     db_delete('facebook_status_tags')
-  ->condition('rid', $array['tid'])
-  ->condition('type', 'term')
-  ->execute();
+		  ->condition('rid', $array['tid'])
+		  ->condition('type', 'term')
+		  ->execute();
   }
   elseif ($type == 'taxonomy_vocabulary') {
     if ($array['vid'] === variable_get('facebook_status_tags_vid', -1)) {
@@ -717,8 +715,8 @@ function facebook_status_tags_taxonomy($op, $type, $array = NULL) {
       // TODO Please review the conversion of this statement to the D7 database API syntax.
       /* db_query("DELETE FROM {facebook_status_tags} WHERE type = 'term'") */
       db_delete('facebook_status_tags')
-  ->condition('type', 'term')
-  ->execute();
+			  ->condition('type', 'term')
+			  ->execute();
       variable_set('facebook_status_tags_vid', -1);
     }
   }
@@ -732,8 +730,8 @@ function facebook_status_tags_user_cancel($edit, $account, $method) {
     // TODO Please review the conversion of this statement to the D7 database API syntax.
     /* db_query("DELETE FROM {facebook_status_tags} WHERE rid = %d and type = 'user'", $account->uid) */
     db_delete('facebook_status_tags')
-  ->condition('rid', $account->uid)
-  ->execute();
+		  ->condition('rid', $account->uid)
+		  ->execute();
   }
 }
 

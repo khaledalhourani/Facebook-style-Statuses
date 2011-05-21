@@ -42,7 +42,7 @@ function facebook_status_admin($form, &$form_state) {
     '#type' => 'select',
     '#title' => t('Show a view under the status update form at the "Share status" page at /statuses/share'),
     '#description' => t('The default facebook_status_stream view is recommended.'),
-    '#default_value' => variable_get('facebook_status_share_view', $list['facebook_status_all']),
+    '#default_value' => variable_get('facebook_status_share_view', $list['facebook_status_stream']),
     '#options' => $list,
     '#weight' => -10,
   );
@@ -77,16 +77,6 @@ function facebook_status_admin_advanced($form, &$form_state) {
       t('Enabling this setting allows line breaks to appear without the side-effect of the input filter.'),
     '#default_value' => variable_get('facebook_status_nl2br', 0),
     '#weight' => -60,
-  );
-  $form['facebook_status_refresh'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Show AJAX "Refresh" link after status update views'),
-    '#description' => t('Display a "Refresh" link under content that will be automatically refreshed when the status update form is submitted.') . ' ' .
-      t('Clicking the link will similarly update the related content via JavaScript, without refreshing the page.') . ' ' .
-      t('Obviously, the "Refresh" link will only appear when there is something that can be refreshed.') . ' ' .
-      t('If you disable AHAH refreshing below or if you have no views attached to your status update forms, this setting is useless.'),
-    '#default_value' => variable_get('facebook_status_refresh', 0),
-    '#weight' => -50,
   );
   $form['facebook_status_profile'] = array(
     '#type' => 'checkbox',
@@ -173,7 +163,6 @@ function facebook_status_admin_contexts($form, &$form_state) {
     );
     $form['components'][$type]['already_saved'] = array(
       '#type' => 'hidden',
-      //'#value' => isset($values['in_db']) ? $values['in_db'] : FALSE,
       '#value' => isset($values['in_db']) ? $values['in_db'] : FALSE,
     );
   }

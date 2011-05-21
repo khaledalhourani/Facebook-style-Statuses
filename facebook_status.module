@@ -146,7 +146,7 @@ function facebook_status_menu() {
  * The page callback for the share-status page.
  */
 function facebook_status_share_page() {
-  $view = variable_get('facebook_status_share_view', 'facebook_status_all');
+  $view = variable_get('facebook_status_share_view', 'facebook_status_stream');
   return theme('facebook_status_form_display', array('recipient' => $GLOBALS['user'], 'type' => 'user', 'view' => $view));
 }
 

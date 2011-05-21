@@ -61,18 +61,18 @@ function facebook_status_tags_install() {
   if (module_exists('taxonomy')) {
     // Create a default vocabulary for use with hashtags.
     $vocab = array(
-      'name' => st('Hashtags'),
-      'description' => st('Contains #hashtags used in Facebook-style Statuses.'),
-      'multiple' => '1',
-      'required' => '0',
+      'name' => t('Hashtags'),
+      'description' => t('Contains #hashtags used in Facebook-style Statuses.'),
+      'machine_name' => 'hashtags',
       'hierarchy' => '0',
       'relations' => '0',
       'tags' => '1',
       'module' => 'facebook_status_tags',
       'help' => '',
     );
+    $vocabulary = (object) $vocab;
     taxonomy_vocabulary_save($vocabulary /* TODO Vocabulary object replaces array $vocab */);
-    $vid = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE name = :name", array(':name' => st('Hashtags')))->fetchField();
+    $vid = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE name = :name", array(':name' => t('Hashtags')))->fetchField();
     variable_set('facebook_status_tags_vid', $vid);
   }
   else {
@@ -88,6 +88,14 @@ function facebook_status_tags_install() {
 function facebook_status_tags_uninstall() {
   // TODO The drupal_(un)install_schema functions are called automatically in D7.
   // drupal_uninstall_schema('facebook_status_tags')
+  
+  db_drop_table('facebook_status_tags');
+  
+  $del_vid = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE name = :name", array(':name' => t('Hashtags')))->fetchField();
+  db_delete('taxonomy_vocabulary')
+    ->condition('vid', $del_vid)
+    ->execute();
+    
   variable_del('facebook_status_tags_url');
   variable_del('facebook_status_tags_vid');
   variable_del('facebook_status_tags_time');
@@ -95,5 +103,5 @@ function facebook_status_tags_uninstall() {
   // Although not deleting this leaves an unnecessary row in the variable
   // table, it's a PITA for site admin to change its value, so it stays in case
   // FBSST is ever installed again.
-  //variable_del('facebook_status_tags_alt_pattern');
+  variable_del('facebook_status_tags_alt_pattern');
 }
