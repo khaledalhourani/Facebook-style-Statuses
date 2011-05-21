@@ -105,7 +105,6 @@ function facebook_status_tags_block_validate($form, &$form_state) {
  */
 function facebook_status_tags_form_facebook_status_admin_alter(&$form, &$form_state) {
   if (module_exists('taxonomy')) {
-    #print variable_get('facebook_status_tags_vid'); die();
     if (variable_get('facebook_status_tags_vid', -1) == -1) {
       drupal_set_message(
         t('You have the Taxonomy and Facebook-style Statuses Tags modules enabled, but you have not set them up to work together!') . ' ' .
@@ -215,7 +214,8 @@ function theme_facebook_status_popular_tags($variables) {
  *   An array of status objects.
  */
 function facebook_status_tags_get_statuses($tag, $type = 'term', $count = 1, $sender = 0) {
-  print $tag . '<br>' . $type . '<br>' . $count . '<br>' .$sender; die();
+  print "xx";
+	print $tag . '<br>' . $type . '<br>' . $count . '<br>' .$sender; die();
   $params = array($tag, $type);
   if (is_int($tag)) {
     $rid = 'rid = %d';
@@ -266,6 +266,7 @@ function facebook_status_tags_get_statuses($tag, $type = 'term', $count = 1, $se
  *   The number of tags of the given type the relevant status has.
  */
 function facebook_status_tags_has_tags($sid, $type = NULL) {
+	print "ff";
 	print $type . '<br>' . $sid . "269"; die();
   $sql = "SELECT COUNT(rid) FROM {facebook_status_tags} WHERE sid = %d";
   $args = array($sid);
@@ -386,7 +387,7 @@ function facebook_status_tags_popular_users($count = 5, $time = 'all', $options 
  *   popular first) and with the property "popularity" added to each object.
  */
 function facebook_status_tags_popular($type = 'term', $count = 5, $time = 'all', $options = array()) {
-	print_r($options) . "388"; die();
+	#print_r($options) . "388"; die();
   $now = REQUEST_TIME;
   if (is_numeric($time)) {
     if ($time < 0) {
@@ -426,16 +427,17 @@ function facebook_status_tags_popular($type = 'term', $count = 5, $time = 'all',
     $restrict .= "(f.sender <> f.recipient OR f.type <> 'user') AND ";
   }
   if ($options['current user only']) {
-    $restrict .= "f.sender = %d AND ";
-    $args[] = $GLOBALS['user']->uid;
+    $restrict .= "f.sender = :userid AND ";
+    $args['userid'] = $GLOBALS['user']->uid;
   }
-  $args[] = $type;
-  $args[] = $time;
+  $args['type'] = $type;
+  $args['time'] = $time;
+  
   // TODO Please convert this statement to the D7 database API syntax.
   $result = db_query_range("SELECT COUNT(t.sid) count, t.rid FROM {facebook_status_tags} t INNER JOIN {facebook_status} f ON t.sid = f.sid
-    WHERE " . $restrict . "t.type = '%s' AND f.created > %d GROUP BY t.rid ORDER BY count DESC, t.sid DESC", $args);
+    WHERE " . $restrict . "t.type = :type AND f.created > :time GROUP BY t.rid ORDER BY count DESC, t.sid DESC", 0, variable_get('facebook_status_tags_count', 5), array(':type' => $args['type'], ':time' => $args['time']));
   $tags = array();
-  while ($tag = db_fetch_object($result)) {
+  while ($tag = $result->fetchObject()) {
     $c = $tag->count;
     if ($type == 'term') {
       $tag = taxonomy_term_load($tag->rid);
@@ -446,6 +448,7 @@ function facebook_status_tags_popular($type = 'term', $count = 5, $time = 'all',
     $tag->popularity = $c;
     $tags[] = $tag;
   }
+  #echo '<pre>'.print_r($tags, true).'</pre>'; die();
   return $tags;
 }
 
@@ -703,7 +706,6 @@ function facebook_status_tags_views_data_alter(&$data) {
  * Implements hook_taxonomy_term_delete($term).
  */
 function facebook_status_tags_taxonomy_term_delete($term) {
-	 #dsm($term);
 	 db_delete('facebook_status_tags')
      ->condition('rid', $array['tid'])
      ->condition('type', 'term')
