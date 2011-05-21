@@ -61,7 +61,7 @@ class facebook_status_tags_views_handler_argument_has_this_tag_id extends views_
       $operator = empty($this->options['not']) ? 'IN' : 'NOT IN';
       $placeholders = implode(', ', array_fill(0, sizeof($this->value), '%d'));
       $query = "$this->table_alias.$this->real_field IN (SELECT sid FROM {facebook_status_tags} WHERE rid $operator ($placeholders) $where)";
-      $this->query->add_where(0, db_prefix_tables($query), $this->value);
+      $this->query->add_where_expression(0, $query, $this->value);
     }
     // If there are exactly 2 users specified, show the exchange between them.
     if (count($this->value) == 2) {
@@ -69,12 +69,12 @@ class facebook_status_tags_views_handler_argument_has_this_tag_id extends views_
       $placeholders = implode(', ', array_fill(0, sizeof($this->value), '%d'));
       $query = "$this->table_alias.$this->real_field IN (SELECT sid FROM {facebook_status_tags} WHERE rid $operator ($placeholders) $where)";
       $query .= "AND $this->table_alias.pid IN (%d, %d)";
-      $this->query->add_where(0, db_prefix_tables($query), array_merge($this->value, $this->value));
+      $this->query->add_where_expression(0, $query, array_merge($this->value, $this->value));
     }
     else {
       $operator = empty($this->options['not']) ? '=' : '!=';
       $query = "$this->table_alias.$this->real_field IN (SELECT sid FROM {facebook_status_tags} WHERE rid $operator %d $where)";
-      $this->query->add_where(0, db_prefix_tables($query), $this->argument);
+      $this->query->add_where_expression(0, $query, $this->argument);
     }
     //}
     /*

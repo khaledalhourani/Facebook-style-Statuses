@@ -69,8 +69,9 @@ class facebook_status_tags_views_handler_argument_has_this_tag extends views_han
       }
       $where .= implode("' OR type = '", $types) . "')";
     }
-    $query = "$field IN (SELECT sid FROM {facebook_status_tags} WHERE name = '%s' $where)";
-    $this->query->add_where(0, db_prefix_tables($query), $argument);
+    $query = "$field IN (SELECT sid FROM {facebook_status_tags} WHERE name = '$argument' $where)";
+    #print $query; die();
+    $this->query->add_where_expression(0, $query, array());
   }
   function default_actions($which = NULL) {
     $defaults = parent::default_actions($which);

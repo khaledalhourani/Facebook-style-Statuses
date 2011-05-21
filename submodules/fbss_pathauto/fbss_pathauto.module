@@ -12,8 +12,8 @@ function fbss_pathauto_facebook_status_delete($sid) {
   // TODO Please review the conversion of this statement to the D7 database API syntax.
   /* db_query("DELETE FROM {url_alias} WHERE src = 'statuses/%d'", $sid) */
   db_delete('url_alias')
-  ->condition('src', $sid)
-  ->execute();
+	  ->condition('src', $sid)
+	  ->execute();
 }
 
 /**
@@ -106,7 +106,7 @@ function fbss_pathauto_pathauto_bulkupdate() {
         ON CONCAT('statuses/', CAST(fbss.sid AS CHAR)) = alias.src
       WHERE alias.src IS NULL");
     $placeholders = array();
-    while ($status = db_fetch_object($result)) {
+    while ($status = $result->fetchObject()) {
       // pathauto.inc should already be included.
       $placeholders = pathauto_get_placeholders('facebook_status', $status);
       $source = 'statuses/' . $status->sid;

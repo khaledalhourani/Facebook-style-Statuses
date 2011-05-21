@@ -50,10 +50,6 @@ function facebook_status_edit($form, &$form_state, $status) {
  * Validate function for the status update form.
  */
 function facebook_status_edit_validate($form, &$form_state) {
-  $maxlen = variable_get('facebook_status_length', 140);
-  if (drupal_strlen($form_state['values']['fbss-status']) > $maxlen) {
-    form_set_error('status', t('The status must be no longer than %chars characters.', array('%chars' => $maxlen)));
-  }
 }
 
 /**

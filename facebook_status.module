@@ -212,11 +212,6 @@ function facebook_status_block_save($delta, $edit) {
 }
 
 /**
- * Implements hook_block().
- */
-function facebook_status_block_OLD($op = 'list', $delta = 0, $edit = NULL) { }
-
-/**
  * Implements hook_permission().
  */
 function facebook_status_permission() {
@@ -985,7 +980,7 @@ function facebook_status_facebook_status($op, $a1, $context = NULL) {
     return;
   }
   $aids = _trigger_get_hook_aids('facebook_status', $op);
-  print_r($aids); die();
+  print_r($aids) . "983"; die();
   if ($op == 'fbss_deleted' || $op == 'fbss_edited') {
     $status = facebook_status_load($a1);
   }

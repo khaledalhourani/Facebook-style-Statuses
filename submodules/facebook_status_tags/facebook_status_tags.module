@@ -266,6 +266,7 @@ function facebook_status_tags_get_statuses($tag, $type = 'term', $count = 1, $se
  *   The number of tags of the given type the relevant status has.
  */
 function facebook_status_tags_has_tags($sid, $type = NULL) {
+	print $type . '<br>' . $sid . "269"; die();
   $sql = "SELECT COUNT(rid) FROM {facebook_status_tags} WHERE sid = %d";
   $args = array($sid);
   if (!empty($type)) {
@@ -385,6 +386,7 @@ function facebook_status_tags_popular_users($count = 5, $time = 'all', $options 
  *   popular first) and with the property "popularity" added to each object.
  */
 function facebook_status_tags_popular($type = 'term', $count = 5, $time = 'all', $options = array()) {
+	print_r($options) . "388"; die();
   $now = REQUEST_TIME;
   if (is_numeric($time)) {
     if ($time < 0) {
@@ -525,6 +527,7 @@ function _facebook_status_tags_filter($subject, $new = FALSE) {
             'vid' => variable_get('facebook_status_tags_vid', -1),
             'name' => $match,
           );
+          $term = (object) $term;
           taxonomy_term_save($term /* TODO Term object replaces array $term */);
         }
         $dest = _facebook_status_tags_resolve($term);
@@ -584,6 +587,7 @@ function _facebook_status_tags_resolve($term) {
   // str_ireplace() is not defined in PHP4 so we use the case-sensitive version.
   if ($phpversion == 5) {
     return str_ireplace(array('[term-id]', '[term-name]'), array($term->tid, $term->name), $url);
+    
   }
   else {
     return str_replace(array('[term-id]', '[term-name]'), array($term->tid, $term->name), $url);
@@ -594,7 +598,7 @@ function _facebook_status_tags_resolve($term) {
  * Gets a taxonomy term by name.
  */
 function _facebook_status_tags_get_term($name) {
-  return db_query("SELECT tid, name FROM {taxonomy_term_data} WHERE LOWER(name) = :LOWER(name) AND vid = :vid", array(':LOWER(name)' => LOWER('%s'), ':vid' => $name, '' => variable_get('facebook_status_tags_vid', - 1)))->fetchObject();
+  return db_query("SELECT tid, name FROM {taxonomy_term_data} WHERE name = :name", array(':name' => $name))->fetchObject();
 }
 
 //===================
@@ -605,6 +609,8 @@ function _facebook_status_tags_get_term($name) {
  * Implements hook_preprocess_facebook_status_item().
  */
 function facebook_status_tags_preprocess_facebook_status_item(&$vars) {
+	dsm($vars);
+	print "614";
   $message = $vars['message'];
   // $message comes in pre-encoded. Temporarily replace the single-quote
   // character encoding so it doesn't get unintentionally linkified.
@@ -615,14 +621,12 @@ function facebook_status_tags_preprocess_facebook_status_item(&$vars) {
 /**
  * Implements hook_facebook_status_save().
  */
-function facebook_status_tags_facebook_status_save($status, $edit = FALSE) {
-  // If the status was just edited, the tags could have changed, so we flush them.
+function facebook_status_tags_facebook_status_save($status, $context = NULL, $edit = FALSE) {
+	// If the status was just edited, the tags could have changed, so we flush them.
   if ($edit) {
-    // TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query("DELETE FROM {facebook_status_tags} WHERE sid = %d", $status->sid) */
     db_delete('facebook_status_tags')
-  ->condition('sid', $status->sid)
-  ->execute();
+		  ->condition('sid', $status->sid)
+		  ->execute();
   }
   $matches = _facebook_status_tags_filter($status->message, TRUE);
   // Users.
@@ -664,6 +668,7 @@ function facebook_status_tags_facebook_status_save($status, $edit = FALSE) {
  * Implements hook_facebook_status_delete().
  */
 function facebook_status_tags_facebook_status_delete($sid) {
+	dsm($sid);
   // TODO Please review the conversion of this statement to the D7 database API syntax.
   /* db_query("DELETE FROM {facebook_status_tags} WHERE sid = %d", $sid) */
   db_delete('facebook_status_tags')
@@ -695,30 +700,29 @@ function facebook_status_tags_views_data_alter(&$data) {
 }
 
 /**
- * Implements hook_taxonomy().
+ * Implements hook_taxonomy_term_delete($term).
  */
-function facebook_status_tags_taxonomy($op, $type, $array = NULL) {
-  if ($op != 'delete') {
-    return;
-  }
-  if ($type == 'term') {
+function facebook_status_tags_taxonomy_term_delete($term) {
+	 #dsm($term);
+	 db_delete('facebook_status_tags')
+     ->condition('rid', $array['tid'])
+     ->condition('type', 'term')
+     ->execute();
+}
+
+/**
+ * Implements hook_taxonomy_vocabulary_delete($vocabulary).
+ */
+function facebook_status_tags_taxonomy_vocabulary_delete($vocabulary) {
+	print $vocabulary; die();
+  if ($array['vid'] === variable_get('facebook_status_tags_vid', -1)) {
+    // If the vocabulary is deleted, all the tags will no longer exist, so the references are invalid.
     // TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query("DELETE FROM {facebook_status_tags} WHERE rid = %d AND type = 'term'", $array['tid']) */
+    /* db_query("DELETE FROM {facebook_status_tags} WHERE type = 'term'") */
     db_delete('facebook_status_tags')
-		  ->condition('rid', $array['tid'])
-		  ->condition('type', 'term')
-		  ->execute();
-  }
-  elseif ($type == 'taxonomy_vocabulary') {
-    if ($array['vid'] === variable_get('facebook_status_tags_vid', -1)) {
-      // If the vocabulary is deleted, all the tags will no longer exist, so the references are invalid.
-      // TODO Please review the conversion of this statement to the D7 database API syntax.
-      /* db_query("DELETE FROM {facebook_status_tags} WHERE type = 'term'") */
-      db_delete('facebook_status_tags')
-			  ->condition('type', 'term')
-			  ->execute();
-      variable_set('facebook_status_tags_vid', -1);
-    }
+      ->condition('type', 'term')
+      ->execute();
+    variable_set('facebook_status_tags_vid', -1);
   }
 }
 
@@ -734,8 +738,3 @@ function facebook_status_tags_user_cancel($edit, $account, $method) {
 		  ->execute();
   }
 }
-
-/**
- * Implements hook_user().
- */
-function facebook_status_tags_user_OLD($op, &$edit, &$account, $category = NULL) { }

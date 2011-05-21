@@ -221,7 +221,7 @@ function facebook_status_tags_views_default_views() {
     'default' => '-1',
   ));
   $handler = $view->new_display('page', 'Page', 'page_1');
-  $handler->override_option('path', 'statuses/term');
+  $handler->override_option('path', 'statuses/term/%');
   $handler->override_option('menu', array(
     'type' => 'none',
     'title' => '',
