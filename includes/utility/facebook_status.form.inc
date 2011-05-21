@@ -226,6 +226,7 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
  * Validate function for the status update form.
  */
 function facebook_status_box_validate($form, &$form_state) {
+	return;
 }
 
 /**
@@ -243,6 +244,10 @@ function facebook_status_box_submit($form, &$form_state) {
   if ($new_status != $default) {
     $new_status_obj = facebook_status_save_status($recipient, $type, $new_status);
     if (isset($new_status_obj->sid)) {
+    	$status = new stdClass();
+    	$status->sid = $new_status_obj->sid;
+    	$status->message = $new_status;
+    	module_invoke('facebook_status_tags', 'facebook_status_save', $status, $context, FALSE);
       $form_state['facebook_status']['sid'] = $new_status_obj->sid;
     }
   }

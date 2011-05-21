@@ -50,6 +50,7 @@ function facebook_status_edit($form, &$form_state, $status) {
  * Validate function for the status update form.
  */
 function facebook_status_edit_validate($form, &$form_state) {
+	return;
 }
 
 /**
