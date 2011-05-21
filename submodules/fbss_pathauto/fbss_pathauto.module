@@ -9,10 +9,8 @@
  * Implements hook_facebook_status_delete().
  */
 function fbss_pathauto_facebook_status_delete($sid) {
-  // TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("DELETE FROM {url_alias} WHERE src = 'statuses/%d'", $sid) */
   db_delete('url_alias')
-	  ->condition('src', $sid)
+	  ->condition('source', $sid)
 	  ->execute();
 }
 

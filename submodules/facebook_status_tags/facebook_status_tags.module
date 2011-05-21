@@ -30,22 +30,28 @@ function facebook_status_tags_help($path, $arg) {
  * Implements hook_block_info().
  */
 function facebook_status_tags_block_info() {
-  if (TRUE) {
-    $block['facebook_status_popular_tags']['info'] = t('Facebook-style Statuses Popular Tags');
+    $block['facebook_status_popular_tags'] = array(
+      'info' => t('Facebook-style Statuses Popular Tags'),
+      'status'     => TRUE,
+	    'weight'     => 0,
+	    'visibility' => 1,
+    );
     return $block;
-  }
 }
 
 /**
  * Implements hook_block_view().
  */
 function facebook_status_tags_block_view($delta) {
-  if (TRUE && $delta == 'facebook_status_popular_tags') {
-    $block['subject'] = t('Popular tags');
-    // TODO Please change this theme call to use an associative array for the $variables parameter.
-    $block['content'] = theme('facebook_status_popular_tags');
-    return $block;
-  }
+	$block = array();
+	switch ($delta):
+	  case 'facebook_status_popular_tags':
+	    $block['subject'] = t('Popular tags');
+	    // TODO Please change this theme call to use an associative array for the $variables parameter.
+      $block['content'] = theme('facebook_status_popular_tags');
+      break;
+  endswitch;
+  return $block;
 }
 
 /**
@@ -181,6 +187,7 @@ function theme_facebook_status_popular_tags($variables) {
   $terms = facebook_status_tags_popular_terms($count, $time);
   $items = array();
   foreach ($terms as $term) {
+  	#echo '<pre>'.print_r($term, true).'</pre>'; die();
     $term_link = l($term->name, _facebook_status_tags_resolve($term));
     $items[] = t('!term (@count)', array('!term' => $term_link, '@count' => $term->popularity));
   }
@@ -214,44 +221,40 @@ function theme_facebook_status_popular_tags($variables) {
  *   An array of status objects.
  */
 function facebook_status_tags_get_statuses($tag, $type = 'term', $count = 1, $sender = 0) {
-  print "xx";
-	print $tag . '<br>' . $type . '<br>' . $count . '<br>' .$sender; die();
   $params = array($tag, $type);
   if (is_int($tag)) {
-    $rid = 'rid = %d';
+    $rid = 'rid = ?';
   }
   elseif (is_string($tag)) {
-    $rid = "name = '%s'";
+    $rid = "name = ?";
   }
-  $sql = "SELECT fbst.sid FROM {facebook_status_tags} fbst INNER JOIN {facebook_status} fb ON fbst.sid = fb.sid WHERE fbst." . $rid . " AND fbst.type = '%s' AND ";
+  $sql = "SELECT fbst.sid FROM {facebook_status_tags} fbst INNER JOIN {facebook_status} fb ON fbst.sid = fb.sid WHERE fbst." . $rid . " AND fbst.type = ? AND ";
   if ($sender == 0) {
-    $sql = "SELECT sid FROM {facebook_status_tags} WHERE " . $rid . " AND type = '%s'";
+    $sql = "SELECT sid FROM {facebook_status_tags} WHERE " . $rid . " AND type = ?";
   }
   elseif (is_numeric($sender)) {
     $params[] = $sender;
-    $sql .= 'fb.sender = %d';
+    $sql .= 'fb.sender = ?';
   }
   elseif (is_array($sender)) {
     $params = array_merge($params, $sender);
-    $sql .= 'fb.sender IN (' . db_placeholders($sender) . ')';
+    $sql .= 'fb.sender IN (?)';
   }
   else {
     // Something unexpected happened; abort.
     return array();
   }
-
   if ($count) {
-    // TODO Please convert this statement to the D7 database API syntax.
-    $result = db_query_range($sql, $params);
+    $result = db_query_range($sql, 0, $count, $params);
   }
   else {
-    // TODO Please convert this statement to the D7 database API syntax.
     $result = db_query($sql, $params);
   }
   $statuses = array();
   while ($sid = $result->fetchObject()) {
     $statuses[] = facebook_status_load($sid->sid);
   }
+  echo '<pre>'.print_r($statuses, true).'</pre>'; die();
   return $statuses;
 }
 
@@ -266,21 +269,18 @@ function facebook_status_tags_get_statuses($tag, $type = 'term', $count = 1, $se
  *   The number of tags of the given type the relevant status has.
  */
 function facebook_status_tags_has_tags($sid, $type = NULL) {
-	print "ff";
-	print $type . '<br>' . $sid . "269"; die();
-  $sql = "SELECT COUNT(rid) FROM {facebook_status_tags} WHERE sid = %d";
+  $sql = "SELECT COUNT(rid) FROM {facebook_status_tags} WHERE sid = ?";
   $args = array($sid);
   if (!empty($type)) {
     if (is_string($type)) {
-      $sql .= " AND type = '%s'";
+      $sql .= " AND type = ?";
       $args[] = $type;
     }
     elseif (is_array($type)) {
-      $sql .= " AND TYPE IN (" . db_placeholders($type, 'text') . ")";
+      $sql .= " AND TYPE IN (?)";
       $args = array_merge($args, $type);
     }
   }
-  // TODO Please convert this statement to the D7 database API syntax.
   return db_query($sql, $args)->fetchField();
 }
 
@@ -433,9 +433,12 @@ function facebook_status_tags_popular($type = 'term', $count = 5, $time = 'all',
   $args['type'] = $type;
   $args['time'] = $time;
   
-  // TODO Please convert this statement to the D7 database API syntax.
   $result = db_query_range("SELECT COUNT(t.sid) count, t.rid FROM {facebook_status_tags} t INNER JOIN {facebook_status} f ON t.sid = f.sid
-    WHERE " . $restrict . "t.type = :type AND f.created > :time GROUP BY t.rid ORDER BY count DESC, t.sid DESC", 0, variable_get('facebook_status_tags_count', 5), array(':type' => $args['type'], ':time' => $args['time']));
+    WHERE " . $restrict . "t.type = :type AND f.created > :time GROUP BY t.rid ORDER BY count DESC, t.sid DESC",
+    0, 
+    variable_get('facebook_status_tags_count', 5),
+    $args
+  );
   $tags = array();
   while ($tag = $result->fetchObject()) {
     $c = $tag->count;
@@ -448,7 +451,6 @@ function facebook_status_tags_popular($type = 'term', $count = 5, $time = 'all',
     $tag->popularity = $c;
     $tags[] = $tag;
   }
-  #echo '<pre>'.print_r($tags, true).'</pre>'; die();
   return $tags;
 }
 
@@ -612,8 +614,8 @@ function _facebook_status_tags_get_term($name) {
  * Implements hook_preprocess_facebook_status_item().
  */
 function facebook_status_tags_preprocess_facebook_status_item(&$vars) {
-	dsm($vars);
 	print "614";
+	dsm($vars);
   $message = $vars['message'];
   // $message comes in pre-encoded. Temporarily replace the single-quote
   // character encoding so it doesn't get unintentionally linkified.
@@ -625,6 +627,7 @@ function facebook_status_tags_preprocess_facebook_status_item(&$vars) {
  * Implements hook_facebook_status_save().
  */
 function facebook_status_tags_facebook_status_save($status, $context = NULL, $edit = FALSE) {
+	
 	// If the status was just edited, the tags could have changed, so we flush them.
   if ($edit) {
     db_delete('facebook_status_tags')
@@ -632,17 +635,18 @@ function facebook_status_tags_facebook_status_save($status, $context = NULL, $ed
 		  ->execute();
   }
   $matches = _facebook_status_tags_filter($status->message, TRUE);
+  
   // Users.
   $old_matches = array();
   foreach ($matches['@'] as $account) {
     if (!in_array($account->uid, $old_matches)) {
-      $array = array(
+      $user_array = array(
         'sid' => $status->sid,
         'rid' => $account->uid,
         'type' => 'user',
         'name' => $account->name,
       );
-      drupal_write_record('facebook_status_tags', $array);
+      drupal_write_record('facebook_status_tags', $user_array);
       $old_matches[] = $account->uid;
     }
   }
@@ -653,15 +657,15 @@ function facebook_status_tags_facebook_status_save($status, $context = NULL, $ed
   }
   $old_matches = array();
   foreach ($matches['#'] as $term) {
-    $term = (object) $term;
+    #$term = (object) $term;
     if (!in_array($term->tid, $old_matches)) {
-      $array = array(
+      $term_array = array(
         'sid' => $status->sid,
         'rid' => $term->tid,
         'type' => 'term',
         'name' => $term->name,
       );
-      drupal_write_record('facebook_status_tags', $array);
+      drupal_write_record('facebook_status_tags', $term_array);
       $old_matches[] = $term->tid;
     }
   }
@@ -671,9 +675,6 @@ function facebook_status_tags_facebook_status_save($status, $context = NULL, $ed
  * Implements hook_facebook_status_delete().
  */
 function facebook_status_tags_facebook_status_delete($sid) {
-	dsm($sid);
-  // TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("DELETE FROM {facebook_status_tags} WHERE sid = %d", $sid) */
   db_delete('facebook_status_tags')
   ->condition('sid', $sid)
   ->execute();
@@ -718,9 +719,6 @@ function facebook_status_tags_taxonomy_term_delete($term) {
 function facebook_status_tags_taxonomy_vocabulary_delete($vocabulary) {
 	print $vocabulary; die();
   if ($array['vid'] === variable_get('facebook_status_tags_vid', -1)) {
-    // If the vocabulary is deleted, all the tags will no longer exist, so the references are invalid.
-    // TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query("DELETE FROM {facebook_status_tags} WHERE type = 'term'") */
     db_delete('facebook_status_tags')
       ->condition('type', 'term')
       ->execute();
@@ -732,11 +730,7 @@ function facebook_status_tags_taxonomy_vocabulary_delete($vocabulary) {
  * Implements hook_user_cancel().
  */
 function facebook_status_tags_user_cancel($edit, $account, $method) {
-  if (TRUE) {
-    // TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query("DELETE FROM {facebook_status_tags} WHERE rid = %d and type = 'user'", $account->uid) */
     db_delete('facebook_status_tags')
 		  ->condition('rid', $account->uid)
 		  ->execute();
-  }
 }
