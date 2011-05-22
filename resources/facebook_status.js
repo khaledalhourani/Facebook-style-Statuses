@@ -1,4 +1,4 @@
-(function ($) { $(function() {
+(function ($) {
   
 var allowClickRefresh = true;
 Drupal.behaviors.facebookStatus = {
@@ -212,4 +212,4 @@ function allowRefresh() {
   allowClickRefresh = !allowClickRefresh;
 }
 
-})})(jQuery);
+})(jQuery);
