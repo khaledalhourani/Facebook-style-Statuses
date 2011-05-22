@@ -614,8 +614,6 @@ function _facebook_status_tags_get_term($name) {
  * Implements hook_preprocess_facebook_status_item().
  */
 function facebook_status_tags_preprocess_facebook_status_item(&$vars) {
-	print "614";
-	dsm($vars);
   $message = $vars['message'];
   // $message comes in pre-encoded. Temporarily replace the single-quote
   // character encoding so it doesn't get unintentionally linkified.

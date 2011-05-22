@@ -68,13 +68,9 @@ function fbss_comments_menu() {
  * Implements hook_user_cancel().
  */
 function fbss_comments_user_cancel($edit, $account, $method) {
-  if (TRUE) {
-    // TODO Please review the conversion of this statement to the D7 database API syntax.
-    /* db_query("DELETE FROM {fbss_comments} WHERE uid = %d", $account->uid) */
-    db_delete('fbss_comments')
-  ->condition('uid', $account->uid)
-  ->execute();
-  }
+  db_delete('fbss_comments')
+	  ->condition('uid', $account->uid)
+	  ->execute();
 }
 
 /**
@@ -304,11 +300,13 @@ function theme_fbss_comments_form_display($variables) {
     $output = '';
     if ($delay_load_form && !fbss_comments_count_comments($sid)) {
       $output = '<div class="fbss-comments-show-comment-form" id="fbss-comments-toggle-' . $sid . '">' .
-        l(t('Comment'), 'statuses/' . $sid, array('attributes' => array('class' => 'fbss-comments-show-comment-form-link')))
+        l(t('Comment'), 'statuses/' . $sid, array('attributes' => array( 'class' => 'fbss-comments-show-comment-form-link')))
         . '</div>';
-      return $output . '<div class="fbss-comments-hide fbss-comments-form">' . drupal_get_form('fbss_comments_box', $sid, $delay_load_comments) . '</div>';
+     
+      return $output . '<div class="fbss-comments-hide fbss-comments-form">' . drupal_render(drupal_get_form('fbss_comments_box', $sid, $delay_load_comments)) . '</div>';
     }
-    return '<div class="fbss-comments-form">' . drupal_get_form('fbss_comments_box', $sid, $delay_load_comments) . '</div>';
+    
+    return '<div class="fbss-comments-form">' . drupal_render(drupal_get_form('fbss_comments_box', $sid, $delay_load_comments)) . '</div>';
   }
 }
 
@@ -324,16 +322,16 @@ function theme_fbss_comments_form_display($variables) {
  * @return
  *   A full status comment object.
  */
-function fbss_comments_load($cids) {
-  foreach ($cids as $nid => &$cid) {
-    if (!is_numeric($cid)) {
-      return;
-    }
-    $node_additions = db_fetch_object(db_query("SELECT * FROM {fbss_comments} WHERE cid = :cid", array(':cid' => $cid)));
-    foreach ($node_additions as $property => &$value) {
-      $cid->$property = $value;
-    }
+function fbss_comments_load($cid) {
+  if (!is_numeric($cid)) {
+    return;
   }
+  $node_additions = db_query("SELECT * FROM {fbss_comments} WHERE cid = :cid", array(':cid' => $cid))->fetchObject();
+  $new_cid = new stdClass();
+  foreach ($node_additions as $property => &$value) {
+    $new_cid->$property = $value;
+  }
+  return $new_cid;
 }
 
 /**
@@ -347,7 +345,7 @@ function fbss_comments_load($cids) {
 function fbss_comments_get_comments($sid) {
   $result = db_query("SELECT * FROM {fbss_comments} WHERE sid = :sid ORDER BY created ASC, cid ASC", array(':sid' => $sid));
   $results = array();
-  while ($comment = db_fetch_object($result)) {
+  while ($comment = $result->fetchObject()) {
     $results[] = $comment;
   }
   return $results;
@@ -383,11 +381,9 @@ function fbss_comments_save_comment($sid, $comment, $uid = NULL) {
  *   The comment ID.
  */
 function fbss_comments_delete_comment($cid) {
-  // TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("DELETE FROM {fbss_comments} WHERE cid = %d", $cid) */
   db_delete('fbss_comments')
-  ->condition('cid', $cid)
-  ->execute();
+	  ->condition('cid', $cid)
+	  ->execute();
   module_invoke_all('fbss_comments_delete', $cid);
 }
 
@@ -563,10 +559,15 @@ function fbss_comments_box($form, $form_state, $sid, $delay_load = TRUE) {
     $form['#qu'] = $form_state['fbss_comments']['q'];
   }
   $comments = fbss_comments_get_comments($sid);
-  $form['before'] = array('#value' => '<div id="fbss-comments-replace-' . $sid . '">');
-  $form['comments'] = array('#value' => theme('fbss_comments_items', array('comments' => $comments, 'delay_load' => $delay_load, 'destination' => $form['#qu'])));
+  $form['before'] = array(
+    '#type' => 'markup',
+    '#markup' => '<div id="fbss-comments-replace-' . $sid . '">'
+  );
+  $form['comments'] = array('#markup' => theme('fbss_comments_items', array('comments' => $comments, 'delay_load' => $delay_load, 'destination' => $form['#qu'])));
   if (count($comments)) {
-    $form['start-hide'] = array('#value' => '<div class="fbss-comments-show-comment-form-inner" id="fbss-comments-inner-toggle-' . $sid . '">' .
+    $form['start-hide'] = array(
+      '#type' => 'markup',
+      '#markup' => '<div class="fbss-comments-show-comment-form-inner" id="fbss-comments-inner-toggle-' . $sid . '">' .
       l(t('Comment'), 'statuses/' . $sid, array('attributes' => array('class' => 'fbss-comments-show-comment-inner-form-link')))
       . '</div><div class="fbss-comments-hide fbss-comments-replace-inner-' . $sid . '">');
   }
@@ -578,19 +579,19 @@ function fbss_comments_box($form, $form_state, $sid, $delay_load = TRUE) {
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Comment'),
-    '#ahah' => array(
-      'path' => 'fbss_comments/js/refresh',
+    /*'#ajax' => array(
+      'callback' => 'fbss_comments_save_js',
       'wrapper' => 'fbss-comments-replace-' . $sid,
       'effect' => 'fade',
       'method' => 'replace',
-    ),
+    ),*/
   );
   if (count($comments)) {
-    $form['end-hide'] = array('#value' => '</div>');
+    $form['end-hide'] = array('#markup' => '</div>');
   }
-  $form['after'] = array('#value' => '</div>');
+  $form['after'] = array('#markup' => '</div>');
   $form['#sid'] = $sid;
-  if ($form_state['fbss_comments']['sid']) {
+  if (isset($form_state['fbss_comments']['sid'])) {
     $form['#sid'] = $form_state['fbss_comments']['sid'];
   }
   return $form;
@@ -609,15 +610,16 @@ function fbss_comments_box_submit($form, &$form_state) {
 /**
  * Saves status comments via AHAH.
  */
-function fbss_comments_save_js() {
+function fbss_comments_save_js($form, &$form_state) {
+	echo '<pre>'.print_r($form_state, true).'</pre>'; die();
   $form_state = array(
     'storage' => NULL,
     'submitted' => FALSE,
   );
-  $form_build_id = $_POST['form_build_id'];
-  $form = form_get_cache($form_build_id, $form_state);
-  $form_state['post'] = $form['#post'] = $_POST;
-  $form['#programmed'] = $form_state['#redirect'] = FALSE;
+  #$form_build_id = $_POST['form_build_id'];
+  #$form = form_get_cache($form_build_id, $form_state);
+  #$form_state['post'] = $form['#post'] = $_POST;
+  #$form['#programmed'] = $form_state['#redirect'] = FALSE;
   $args = $form['#parameters'];
   // This happens if someone goes directly to the JS processing page.
   if (!is_array($args) && !$args) {
@@ -647,25 +649,23 @@ function fbss_comments_save_js() {
  * Implements hook_facebook_status_delete().
  */
 function fbss_comments_facebook_status_delete($sid) {
-  // TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("DELETE FROM {fbss_comments} WHERE sid = %d", $sid) */
   db_delete('fbss_comments')
-  ->condition('sid', $sid)
-  ->execute();
+	  ->condition('sid', $sid)
+	  ->execute();
 }
 
 /**
  * Implements hook_preprocess_facebook_status_item().
  */
 function fbss_comments_preprocess_facebook_status_item(&$vars) {
-  $vars['comments'] = theme('fbss_comments_form_display', array('sid' => $status->sid, 'delay_load_form' => FALSE, 'delay_load_comments' => FALSE));
+  $vars['comments'] = theme('fbss_comments_form_display', array('sid' => $vars['status']->sid, 'delay_load_form' => FALSE, 'delay_load_comments' => FALSE));
 }
 
 /**
  * Implements hook_views_api().
  */
 function fbss_comments_views_api() {
-  return array('api' => 2);
+  return array('api' => 3);
 }
 
 /**

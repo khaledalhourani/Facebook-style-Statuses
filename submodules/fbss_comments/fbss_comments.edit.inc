@@ -31,17 +31,16 @@ function fbss_comments_edit($form, $form_state, $comment) {
  * The submit handler for the edit form for status comments.
  */
 function fbss_comments_edit_submit($form, &$form_state) {
-  // TODO Please review the conversion of this statement to the D7 database API syntax.
-  /* db_query("UPDATE {fbss_comments} SET comment = '%s' WHERE cid = %d", $form_state['values']['status-comment-edit'], $form['#cid']) */
+  
   db_update('fbss_comments')
-  ->fields(array(
-    'comment' => $form_state['values']['status-comment-edit'],
-  ))
-  ->condition('cid', $form['#cid'])
-  ->execute();
-  $c = fbssc_load($form['#cid']);
-  module_invoke_all('fbss_comments_after_save', $c, TRUE);
-  if ($_GET['destination'] && $_GET['destinaton'] != 'fbss_comments/js/refresh') {
+    ->fields(array(
+      'comment' => $form_state['values']['status-comment-edit'],
+    ))
+	  ->condition('cid', $form['#cid'])
+	  ->execute();
+  #$c = fbssc_load($form['#cid']);
+  module_invoke_all('fbss_comments_after_save', $form['#cid'], TRUE);
+  if (isset($_GET['destination']) && ($_GET['destination'] != 'fbss_comments/js/refresh')) {
     $form_state['redirect'] = $_GET['destination'];
   }
   else {
@@ -59,7 +58,8 @@ function fbss_comments_edit_submit($form, &$form_state) {
 function fbss_comments_delete($form, $form_state, $comment) {
   $form = array();
   $form['infotext'] = array(
-    '#value' => '<p>' . t('Are you sure you want to permanently delete the status comment %comment?',
+    '#type' => 'markup',
+    '#markup' => '<p>' . t('Are you sure you want to permanently delete the status comment %comment?',
       array('%comment' => $comment->comment)) . '</p>',
   );
   $form['confirm'] = array(
@@ -82,7 +82,7 @@ function fbss_comments_delete($form, $form_state, $comment) {
 function fbss_comments_delete_confirm($form, &$form_state) {
   fbss_comments_delete_comment($form['#cid']);
   drupal_set_message(t('Status comment deleted.'));
-  if ($_GET['destination'] && $_GET['destinaton'] != 'fbss_comments/js/refresh') {
+  if (isset($_GET['destination']) && ($_GET['destination'] != 'fbss_comments/js/refresh')) {
     $form_state['redirect'] = $_GET['destination'];
   }
   else {
@@ -95,7 +95,7 @@ function fbss_comments_delete_confirm($form, &$form_state) {
  */
 function fbss_comments_delete_cancel($form, &$form_state) {
   drupal_set_message(t('Status comment was not deleted.'));
-  if ($_GET['destination'] && $_GET['destinaton'] != 'fbss_comments/js/refresh') {
+  if (isset($_GET['destination']) && $_GET['destination'] != 'fbss_comments/js/refresh') {
     $form_state['redirect'] = $_GET['destination'];
   }
   else {
