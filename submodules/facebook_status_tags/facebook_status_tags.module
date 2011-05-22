@@ -533,7 +533,7 @@ function _facebook_status_tags_filter($subject, $new = FALSE) {
             'name' => $match,
           );
           $term = (object) $term;
-          taxonomy_term_save($term /* TODO Term object replaces array $term */);
+          taxonomy_term_save($term);
         }
         $dest = _facebook_status_tags_resolve($term);
         $link = $op . l($term->name, $dest);
@@ -625,7 +625,6 @@ function facebook_status_tags_preprocess_facebook_status_item(&$vars) {
  * Implements hook_facebook_status_save().
  */
 function facebook_status_tags_facebook_status_save($status, $context = NULL, $edit = FALSE) {
-	
 	// If the status was just edited, the tags could have changed, so we flush them.
   if ($edit) {
     db_delete('facebook_status_tags')
@@ -633,11 +632,10 @@ function facebook_status_tags_facebook_status_save($status, $context = NULL, $ed
 		  ->execute();
   }
   $matches = _facebook_status_tags_filter($status->message, TRUE);
-  
   // Users.
-  $old_matches = array();
+  $old_matches_user = array();
   foreach ($matches['@'] as $account) {
-    if (!in_array($account->uid, $old_matches)) {
+    if (!in_array($account->uid, $old_matches_user)) {
       $user_array = array(
         'sid' => $status->sid,
         'rid' => $account->uid,
@@ -645,10 +643,9 @@ function facebook_status_tags_facebook_status_save($status, $context = NULL, $ed
         'name' => $account->name,
       );
       drupal_write_record('facebook_status_tags', $user_array);
-      $old_matches[] = $account->uid;
+      $old_matches_user[] = $account->uid;
     }
   }
-
   // Terms.
   if (!module_exists('taxonomy') || variable_get('facebook_status_tags_vid', -1) == -1) {
     return;
@@ -674,8 +671,8 @@ function facebook_status_tags_facebook_status_save($status, $context = NULL, $ed
  */
 function facebook_status_tags_facebook_status_delete($sid) {
   db_delete('facebook_status_tags')
-  ->condition('sid', $sid)
-  ->execute();
+    ->condition('sid', $sid)
+    ->execute();
 }
 
 //=====================
@@ -715,7 +712,6 @@ function facebook_status_tags_taxonomy_term_delete($term) {
  * Implements hook_taxonomy_vocabulary_delete($vocabulary).
  */
 function facebook_status_tags_taxonomy_vocabulary_delete($vocabulary) {
-	print $vocabulary; die();
   if ($array['vid'] === variable_get('facebook_status_tags_vid', -1)) {
     db_delete('facebook_status_tags')
       ->condition('type', 'term')

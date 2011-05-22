@@ -18,7 +18,7 @@ function facebook_status_edit($form, &$form_state, $status) {
   if ($status->type == 'user' && $status->sender == $status->recipient) {
     $self = ' facebook-status-form-self-update';
   }
-  #$form = array('#cache' => TRUE);
+  $form = array('#cache' => TRUE);
   $form['intro'] = array(
     '#type' => 'markup',
     '#markup' => '<span class="facebook-status-intro">' . $intro . '</span>',
@@ -61,7 +61,7 @@ function facebook_status_edit_submit($form, &$form_state) {
   $context = facebook_status_determine_context($status_old->type);
   $new_status = trim($form_state['values']['fbss-status']);
   $time = REQUEST_TIME;
-  global $user;
+  //global $user;
   //Pretend to have set a new status if the submitted status is exactly the same as the old one.
   if ($new_status != $status_old->message) {
     db_update('facebook_status')
@@ -76,7 +76,7 @@ function facebook_status_edit_submit($form, &$form_state) {
     $status_old->created = $time;
     module_invoke_all('facebook_status_save', $status_old, $context, TRUE);
   }
-  $form_state['redirect'] = empty($_GET['destination']) ? array('statuses/share') : array($_GET['destination']);
+  $form_state['redirect'] = isset($_GET['destination']) ? $_GET['destination'] : 'statuses/share';
   drupal_set_message(t('Status has been successfully edited.'));
   //Trigger integration. Don't call if the status is blank because usually nothing interesting is happening.
   /* i have to close this out, caus some things aren't implemented correct yet. <---

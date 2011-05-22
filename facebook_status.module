@@ -884,7 +884,7 @@ function _facebook_status_user_load($uid) {
 function _facebook_status_user_load_by_name($name) {
   static $accounts = array();
   if (!isset($accounts[$name])) {
-    $accounts[$name] = array_shift(user_load_multiple(array(), array('name' => $name)));
+    $accounts[$name] = array_shift(user_load_multiple(array(), array('name' => $name), FALSE));
   }
   return $accounts[$name];
 }
