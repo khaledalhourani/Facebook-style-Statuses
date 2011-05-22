@@ -935,7 +935,7 @@ function facebook_status_facebook_status_context_info() {
 
 /**
  * Implements hook_trigger_info().
-
+ */
 function facebook_status_trigger_info() {
   $info = array(
     'facebook_status' => array(
@@ -966,7 +966,7 @@ function facebook_status_trigger_info() {
   }
   return $info;
 }
-*/
+
 
 /**
  * Implements hook_facebook_status().

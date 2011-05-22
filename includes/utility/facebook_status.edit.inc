@@ -79,7 +79,6 @@ function facebook_status_edit_submit($form, &$form_state) {
   $form_state['redirect'] = isset($_GET['destination']) ? $_GET['destination'] : 'statuses/share';
   drupal_set_message(t('Status has been successfully edited.'));
   //Trigger integration. Don't call if the status is blank because usually nothing interesting is happening.
-  /* i have to close this out, caus some things aren't implemented correct yet. <---
   if (module_exists('trigger') && !empty($new_status)) {
     $op = 'fbss_edited_' . $status_old->type;
     if ($status_old->type == 'user') {
@@ -87,7 +86,7 @@ function facebook_status_edit_submit($form, &$form_state) {
     }
     module_invoke_all('facebook_status', $op, $status_old, $context);
   }
-   <--- leave !!! */
+  
 }
 
 /**
