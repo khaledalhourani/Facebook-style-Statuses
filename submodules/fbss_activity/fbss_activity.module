@@ -106,7 +106,7 @@ function facebook_status_list_activity_actions($hook, $op, $max_age) {
 
   if (isset($result)) {
     while ($row = $result->fetchObject()) {
-      $actions[] = get_object_vars($row);
+      $actions[] = $row;
     }
   }
 
