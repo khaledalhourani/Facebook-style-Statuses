@@ -11,7 +11,7 @@
 function fbss_activity_facebook_status_delete($sid) {
   $result = db_query("SELECT aid FROM {activity} WHERE type = :type AND eid = :eid", array(':type' => 'facebook_status', ':eid' => $sid));
   $records = array();
-  while ($record = db_fetch_object($result)) {
+  while ($record = $result->fetchObject()) {
     $records[] = $record->aid;
   }
   if (!empty($records)) {
@@ -61,7 +61,7 @@ function facebook_status_activity_grants($activity) {
   $realms = array();
   if ($activity->type == 'facebook_status') {
     $realms['facebook_status_sender'] = array($activity->uid);
-    $result = db_fetch_object(db_query("SELECT recipient FROM {facebook_status} WHERE sid = :sid", array(':sid' => $activity->eid)));
+    $result = db_query("SELECT recipient FROM {facebook_status} WHERE sid = :sid", array(':sid' => $activity->eid))->fetchObject;
     $realms['facebook_status_recipient'] = array($result->recipient);
   }
   return $realms;
@@ -90,10 +90,10 @@ function facebook_status_list_activity_actions($hook, $op, $max_age) {
   }
 
   if ($op == 'fbss_submitted_user_self') {
-    $result = db_query("SELECT sid as id, created, sender as actor FROM {facebook_status} WHERE created > :created AND type = :type AND sender = :sender", array(':created' => $min_time, ':type' => 'user', ':sender' => recipient));
+    $result = db_query("SELECT sid as id, created, sender as actor FROM {facebook_status} WHERE created > :created AND type = :type AND sender = :sender", array(':created' => $min_time, ':type' => 'user', ':sender' => 'recipient'));
   }
   elseif ($op == 'fbss_submitted_user_other') {
-    $result = db_query("SELECT sid as id, created, sender as actor FROM {facebook_status} WHERE created > :created AND type = :type AND sender <> :sender", array(':created' => $min_time, ':type' => 'user', ':sender' => recipient));
+    $result = db_query("SELECT sid as id, created, sender as actor FROM {facebook_status} WHERE created > :created AND type = :type AND sender <> :sender", array(':created' => $min_time, ':type' => 'user', ':sender' => 'recipient'));
   }
   elseif (strpos($op, 'fbss_submitted_') === 0) {
     foreach (facebook_status_all_contexts() as $type => $details) {
@@ -105,12 +105,13 @@ function facebook_status_list_activity_actions($hook, $op, $max_age) {
   }
 
   if (isset($result)) {
-    while ($row = db_fetch_array($result)) {
-      $actions[] = $row;
+    while ($row = $result->fetchObject()) {
+      $actions[] = get_object_vars($row);
     }
   }
 
   drupal_alter('facebook_status_list_activity_actions', $actions);
+  dsm($actions);
   return $actions;
 }
 

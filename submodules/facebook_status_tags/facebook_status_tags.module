@@ -519,7 +519,7 @@ function _facebook_status_tags_filter($subject, $new = FALSE) {
       $link = '';
       if ($op == '@') {
         $account = _facebook_status_user_load_by_name($match);
-        if ($account->uid) {
+        if (isset($account->uid)) {
           $link = $op . theme('username', array('account' => $account));
           $items['@'][] = $account;
         }

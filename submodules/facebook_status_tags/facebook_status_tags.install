@@ -88,6 +88,10 @@ function facebook_status_tags_uninstall() {
   db_drop_table('facebook_status_tags');
   
   $del_vid = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE name = :name", array(':name' => t('Hashtags')))->fetchField();
+  db_delete('taxonomy_term_data')
+    ->condition('vid', $del_vid)
+    ->execute();
+  
   db_delete('taxonomy_vocabulary')
     ->condition('vid', $del_vid)
     ->execute();
