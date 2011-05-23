@@ -239,21 +239,16 @@ function facebook_status_box_submit($form, &$form_state) {
   $recipient = $context['handler']->load_recipient($rid);
   $new_status = trim($form_state['values']['fbss-status']);
   $default = $form_state['values']['sdefault'];
-  $form_state['facebook_status'] = array();
   // Don't save the status if it wasn't changed from the default.
   if ($new_status != $default) {
     $new_status_obj = facebook_status_save_status($recipient, $type, $new_status);
     if (isset($new_status_obj->sid)) {
-    	$status = new stdClass();
-    	$status->sid = $new_status_obj->sid;
-    	$status->message = $new_status;
-    	module_invoke('facebook_status_tags', 'facebook_status_save', $status, $context, FALSE);
-      $form_state['facebook_status']['sid'] = $new_status_obj->sid;
+      $status = new stdClass();
+      $status->sid = $new_status_obj->sid;
+      $status->message = $new_status;
+      module_invoke('facebook_status_tags', 'facebook_status_save', $status, $context, FALSE);
     }
   }
-  $form_state['facebook_status']['type'] = $type;
-  $form_state['facebook_status']['recipient'] = $rid;
-  $form_state['rebuild'] = TRUE;
 }
 
 /**
