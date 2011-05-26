@@ -703,7 +703,7 @@ function facebook_status_views_default_views() {
   $views[$view->name] = $view;
 
 
-   /*
+    /*
    * View 'facebook_status_mystream'
    */
   $view = new view;
@@ -929,7 +929,11 @@ function facebook_status_views_default_views() {
   $handler->display->display_options['filters']['only_own']['id'] = 'only_own';
   $handler->display->display_options['filters']['only_own']['table'] = 'facebook_status';
   $handler->display->display_options['filters']['only_own']['field'] = 'only_own';
-  $handler->display->display_options['filters']['only_own']['value'] = '1';
+  $handler->display->display_options['filters']['only_own']['value'] = '0';
+  /* Filter criterion: Facebook-style Statuses: Use current context */
+  $handler->display->display_options['filters']['auto-type']['id'] = 'auto-type';
+  $handler->display->display_options['filters']['auto-type']['table'] = 'facebook_status';
+  $handler->display->display_options['filters']['auto-type']['field'] = 'auto-type';
   $translatables['facebook_status_mystream'] = array(
     t('Master'),
     t('more'),
@@ -945,6 +949,7 @@ function facebook_status_views_default_views() {
        <div>[created] [edit] [delete] [comment-box]</div>'),
   );
   $views[$view->name] = $view;
+
 
   
   return $views;
