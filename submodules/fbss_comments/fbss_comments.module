@@ -55,12 +55,6 @@ function fbss_comments_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'fbss_comments.edit.inc',
   );
-  /*$items['fbss_comments/js/refresh'] = array(
-    'title' => 'Save status comment form',
-    'page callback' => 'fbss_comments_save_js',
-    'access arguments' => array('post status comment'),
-    'type' => MENU_CALLBACK,
-  );*/
   return $items;
 }
 

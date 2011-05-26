@@ -183,7 +183,6 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     '#weight' => -40,
     '#attributes' => array('class' => array('facebook-status-text facebook-status-text-main')), 
     '#prefix' => '<div id="facebook-status-replace">',
-    '#suffix' => '</div>',
   );
   $form['recipient'] = array(
     '#type' => 'hidden',
@@ -206,11 +205,14 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     '#submit' => array('facebook_status_box_submit'),
     '#weight' => -25,
     '#attributes' => array('class' => array('facebook-status-submit')),
-    /*'#ajax' => array(
-      'callback' => 'fb_callback',
+    '#suffix' => '</div>',
+    /*
+    '#ajax' => array(
+      'callback' => 'fb_cb',
       'wrapper' => 'facebook-status-replace',
-      #'method' => 'replace',
-    ),*/
+      'method' => 'replace',
+    ),
+    */
   );
   if (arg(0) == 'statuses' && arg(1) == 'share' && !empty($_GET['destination']) && $_GET['destination'] != $_GET['q']) {
     $form['back'] = array(
@@ -226,7 +228,6 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
  * Validate function for the status update form.
  */
 function facebook_status_box_validate($form, &$form_state) {
-	return;
 }
 
 /**
@@ -243,10 +244,7 @@ function facebook_status_box_submit($form, &$form_state) {
   if ($new_status != $default) {
     $new_status_obj = facebook_status_save_status($recipient, $type, $new_status);
     if (isset($new_status_obj->sid)) {
-      $status = new stdClass();
-      $status->sid = $new_status_obj->sid;
-      $status->message = $new_status;
-      module_invoke('facebook_status_tags', 'facebook_status_save', $status, $context, FALSE);
+      module_invoke('facebook_status_tags', 'facebook_status_save', $new_status_obj, $context, FALSE);
     }
   }
 }
