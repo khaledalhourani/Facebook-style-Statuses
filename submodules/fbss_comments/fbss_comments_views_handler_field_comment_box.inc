@@ -10,6 +10,7 @@
  */
 class fbss_comments_views_handler_field_comment_box extends views_handler_field {
   function render($values) {
-    return theme('fbss_comments_form_display', array('sid' => $values->facebook_status_sid, 'delay_load_form' => TRUE, 'delay_load_comments' => TRUE));
+  	echo '<pre>'.print_r($values, true).'</pre>'; die();
+    return theme('fbss_comments_form_display', array('sid' => isset($values->facebook_status_sid) ? $values->facebook_status_sid : $values->sid, 'delay_load_form' => TRUE, 'delay_load_comments' => TRUE));
   }
 }

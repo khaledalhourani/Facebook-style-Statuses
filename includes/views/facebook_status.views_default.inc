@@ -703,7 +703,7 @@ function facebook_status_views_default_views() {
   $views[$view->name] = $view;
 
 
-  /*
+   /*
    * View 'facebook_status_mystream'
    */
   $view = new view;
@@ -723,34 +723,81 @@ function facebook_status_views_default_views() {
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['style_plugin'] = 'default';
-  $handler->display->display_options['row_plugin'] = 'fields';
-  /* Field: Facebook-style Statuses: Status ID */
-  $handler->display->display_options['fields']['sid']['id'] = 'sid';
-  $handler->display->display_options['fields']['sid']['table'] = 'facebook_status';
-  $handler->display->display_options['fields']['sid']['field'] = 'sid';
-  $handler->display->display_options['fields']['sid']['label'] = '';
-  $handler->display->display_options['fields']['sid']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['sid']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['sid']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['sid']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['sid']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['sid']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['sid']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['sid']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['sid']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['sid']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['sid']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['sid']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['sid']['element_label_colon'] = 0;
-  $handler->display->display_options['fields']['sid']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['sid']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['sid']['empty_zero'] = 0;
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'user_contextual_pic' => 'user_contextual_pic',
+    'message' => 'message',
+    'created' => 'created',
+    'edit' => 'edit',
+    'delete' => 'delete',
+    'comment-box' => 'comment-box',
+    'nothing' => 'nothing',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'user_contextual_pic' => array(
+      'align' => '',
+      'separator' => '',
+    ),
+    'message' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+    ),
+    'created' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+    ),
+    'edit' => array(
+      'align' => '',
+      'separator' => '',
+    ),
+    'delete' => array(
+      'align' => '',
+      'separator' => '',
+    ),
+    'comment-box' => array(
+      'align' => '',
+      'separator' => '',
+    ),
+    'nothing' => array(
+      'align' => '',
+      'separator' => '',
+    ),
+  );
+  $handler->display->display_options['style_options']['override'] = 1;
+  $handler->display->display_options['style_options']['sticky'] = 0;
+  $handler->display->display_options['style_options']['empty_table'] = 0;
+  /* Field: Facebook-style Statuses: Users with Pictures */
+  $handler->display->display_options['fields']['user_contextual_pic']['id'] = 'user_contextual_pic';
+  $handler->display->display_options['fields']['user_contextual_pic']['table'] = 'facebook_status';
+  $handler->display->display_options['fields']['user_contextual_pic']['field'] = 'user_contextual_pic';
+  $handler->display->display_options['fields']['user_contextual_pic']['label'] = '';
+  $handler->display->display_options['fields']['user_contextual_pic']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['element_label_colon'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['user_contextual_pic']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['user_contextual_pic']['empty_zero'] = 0;
   /* Field: Facebook-style Statuses: Status message */
   $handler->display->display_options['fields']['message']['id'] = 'message';
   $handler->display->display_options['fields']['message']['table'] = 'facebook_status';
   $handler->display->display_options['fields']['message']['field'] = 'message';
   $handler->display->display_options['fields']['message']['label'] = '';
+  $handler->display->display_options['fields']['message']['exclude'] = TRUE;
   $handler->display->display_options['fields']['message']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['message']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['message']['alter']['absolute'] = 0;
@@ -771,6 +818,7 @@ function facebook_status_views_default_views() {
   $handler->display->display_options['fields']['created']['table'] = 'users';
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = '';
+  $handler->display->display_options['fields']['created']['exclude'] = TRUE;
   $handler->display->display_options['fields']['created']['alter']['alter_text'] = 0;
   $handler->display->display_options['fields']['created']['alter']['make_link'] = 0;
   $handler->display->display_options['fields']['created']['alter']['absolute'] = 0;
@@ -786,27 +834,97 @@ function facebook_status_views_default_views() {
   $handler->display->display_options['fields']['created']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['created']['hide_empty'] = 0;
   $handler->display->display_options['fields']['created']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['created']['date_format'] = 'long';
-  /* Field: Facebook-style Statuses: Users with Pictures */
-  $handler->display->display_options['fields']['user_contextual_pic']['id'] = 'user_contextual_pic';
-  $handler->display->display_options['fields']['user_contextual_pic']['table'] = 'facebook_status';
-  $handler->display->display_options['fields']['user_contextual_pic']['field'] = 'user_contextual_pic';
-  $handler->display->display_options['fields']['user_contextual_pic']['label'] = '';
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['element_label_colon'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['user_contextual_pic']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['user_contextual_pic']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['created']['date_format'] = 'time ago';
+  /* Field: Facebook-style Statuses: Edit */
+  $handler->display->display_options['fields']['edit']['id'] = 'edit';
+  $handler->display->display_options['fields']['edit']['table'] = 'facebook_status';
+  $handler->display->display_options['fields']['edit']['field'] = 'edit';
+  $handler->display->display_options['fields']['edit']['label'] = '';
+  $handler->display->display_options['fields']['edit']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['edit']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['edit']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['edit']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['edit']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['edit']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['edit']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['edit']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['edit']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['edit']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['edit']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['edit']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['edit']['element_label_colon'] = 0;
+  $handler->display->display_options['fields']['edit']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['edit']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['edit']['empty_zero'] = 0;
+  /* Field: Facebook-style Statuses: Delete */
+  $handler->display->display_options['fields']['delete']['id'] = 'delete';
+  $handler->display->display_options['fields']['delete']['table'] = 'facebook_status';
+  $handler->display->display_options['fields']['delete']['field'] = 'delete';
+  $handler->display->display_options['fields']['delete']['label'] = '';
+  $handler->display->display_options['fields']['delete']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['delete']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['delete']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['delete']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['delete']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['delete']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['delete']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['delete']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['delete']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['delete']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['delete']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['delete']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['delete']['element_label_colon'] = 0;
+  $handler->display->display_options['fields']['delete']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['delete']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['delete']['empty_zero'] = 0;
+  /* Field: Facebook-style Statuses: Status comment box */
+  $handler->display->display_options['fields']['comment-box']['id'] = 'comment-box';
+  $handler->display->display_options['fields']['comment-box']['table'] = 'facebook_status';
+  $handler->display->display_options['fields']['comment-box']['field'] = 'comment-box';
+  $handler->display->display_options['fields']['comment-box']['label'] = '';
+  $handler->display->display_options['fields']['comment-box']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['comment-box']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['comment-box']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['comment-box']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['comment-box']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['comment-box']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['comment-box']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['comment-box']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['comment-box']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['comment-box']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['comment-box']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['comment-box']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['comment-box']['element_label_colon'] = 0;
+  $handler->display->display_options['fields']['comment-box']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['comment-box']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['comment-box']['empty_zero'] = 0;
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = '';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<div>[user_contextual_pic] [message]</div>
+
+<div>[created] [edit] [delete] [comment-box]</div>';
+  $handler->display->display_options['fields']['nothing']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['nothing']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['nothing']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['nothing']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['nothing']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['nothing']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['nothing']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['nothing']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['nothing']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['nothing']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['nothing']['element_label_colon'] = 0;
+  $handler->display->display_options['fields']['nothing']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['nothing']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['nothing']['empty_zero'] = 0;
+  /* Sort criterion: Facebook-style Statuses: Created time */
+  $handler->display->display_options['sorts']['created']['id'] = 'created';
+  $handler->display->display_options['sorts']['created']['table'] = 'facebook_status';
+  $handler->display->display_options['sorts']['created']['field'] = 'created';
+  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
   /* Filter criterion: Facebook-style Statuses: Only own statuses */
   $handler->display->display_options['filters']['only_own']['id'] = 'only_own';
   $handler->display->display_options['filters']['only_own']['table'] = 'facebook_status';
@@ -823,9 +941,11 @@ function facebook_status_views_default_views() {
     t('Items per page'),
     t('- All -'),
     t('Offset'),
+    t('<div>[user_contextual_pic] [message]</div>
+       <div>[created] [edit] [delete] [comment-box]</div>'),
   );
   $views[$view->name] = $view;
-  
 
+  
   return $views;
 }
