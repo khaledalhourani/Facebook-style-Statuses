@@ -18,10 +18,11 @@ function template_preprocess_fbss_comments_item(&$variables) {
   $userobj = _facebook_status_user_load($comment->uid);
   $comm->userpic = theme('user_picture', array('account' => $userobj));
   $comm->username = theme('username', array('account' => $userobj));
+  $comm->facebook_time = theme('facebook_status_time', array('time' => $comment->created));
   
+  // run filter if one is set in admin
   $comment_text = _facebook_status_run_filter($comment->comment);
   $comm->comment_text = nl2br($comment_text);
-  $comm->facebook_time = theme('facebook_status_time', array('time' => $comment->created));
   
   $q = $_GET['q'];
   if ($variables['destination']) {
@@ -38,5 +39,6 @@ function template_preprocess_fbss_comments_item(&$variables) {
   }
   // Invokes hook_fbss_comments_render_alter(&$output, $comment).
   drupal_alter('fbss_comments_render', $comm, $comment);
+  // grab our variables back from $comm object into variables array
   $variables += get_object_vars($comm);
 }

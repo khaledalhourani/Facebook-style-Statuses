@@ -122,6 +122,7 @@ function facebook_status_menu() {
     'access arguments' => array('view', 1),
     'type' => MENU_CALLBACK,
   );
+  /*
   $items['facebook_status/js'] = array(
     'title' => 'Save status update form',
     'page callback' => 'facebook_status_save_js',
@@ -129,6 +130,7 @@ function facebook_status_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'includes/utility/facebook_status.ahah.inc',
   );
+  */
   if (module_exists('devel_generate')) {
     $items['admin/generate/facebook_status'] = array(
       'title' => 'Generate statuses',
@@ -541,7 +543,7 @@ function facebook_status_user_access($op) {
 function facebook_status_get_statuses($senders = array(), $recipients = array(), $type = NULL, $total = 0) {
   $statuses = array();
   $args = array_merge(array($type), $senders, $recipients);
-  $query = "SELECT * FROM {facebook_status} WHERE created <> 0 AND type = '%s'";
+  $query = "SELECT * FROM {facebook_status} WHERE created <> 0 AND type = ?";
   if (!empty($senders)) {
     $query .= " AND sender IN (" . db_placeholders($senders) . ")";
   }
@@ -762,7 +764,7 @@ function facebook_status_save_status($recipient, $type, $message, $sender = NULL
     'recipient' => $recipient_id,
     'type' => $type,
   );
-  #echo '<pre>'.print_r($status, true).'</pre>'; die();
+ 
   if ($message != $status->message || $type != $status->type || $recipient_id != $status->recipient || !$options['discard duplicates']) {
     $edit = FALSE;
     // If a new status is submitted on one's own profile within
@@ -794,6 +796,7 @@ function facebook_status_save_status($recipient, $type, $message, $sender = NULL
     // Invokes hook_facebook_status_save($status, $context, $edit).
     module_invoke_all('facebook_status_save', $object, $context, $edit);
     // Trigger integration. Don't call if the status is blank because usually nothing interesting is happening.
+    /*
     if (module_exists('trigger') && !empty($message)) {
       $op = 'fbss_submitted_' . $type;
       if ($type == 'user') {
@@ -801,6 +804,7 @@ function facebook_status_save_status($recipient, $type, $message, $sender = NULL
       }
       module_invoke_all('facebook_status', $op, $object, $context);
     }
+    */
   }
   elseif ($message == $status->message) {
     $object->sender = $status->sender;

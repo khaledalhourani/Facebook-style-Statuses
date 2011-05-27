@@ -19,11 +19,14 @@ function fbss_comments_edit($form, $form_state, $comment) {
     '#required' => TRUE,
     '#default_value' => $comment->comment,
   );
+  $form['cid'] = array(
+    '#type' => 'hidden',
+    '#value' => $comment->cid,
+  );
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Update'),
   );
-  $form['#cid'] = $comment->cid;
   return $form;
 }
 
@@ -36,10 +39,10 @@ function fbss_comments_edit_submit($form, &$form_state) {
     ->fields(array(
       'comment' => $form_state['values']['status-comment-edit'],
     ))
-	  ->condition('cid', $form['#cid'])
+	  ->condition('cid', $form_state['values']['cid'])
 	  ->execute();
   #$c = fbssc_load($form['#cid']);
-  module_invoke_all('fbss_comments_after_save', $form['#cid'], TRUE);
+  module_invoke_all('fbss_comments_after_save', $form_state['values']['cid'], TRUE);
   if (isset($_GET['destination']) && ($_GET['destination'] != 'fbss_comments/js/refresh')) {
     $form_state['redirect'] = $_GET['destination'];
   }
@@ -72,7 +75,10 @@ function fbss_comments_delete($form, $form_state, $comment) {
     '#value' => t('Cancel'),
     '#submit' => array('fbss_comments_delete_cancel'),
   );
-  $form['#cid'] = $comment->cid;
+  $form['cid'] = array(
+    '#type' => 'hidden',
+    '#value' => $comment->cid,
+  );
   return $form;
 }
 
@@ -80,7 +86,7 @@ function fbss_comments_delete($form, $form_state, $comment) {
  * The confirmation submit handler for the delete form for status comments.
  */
 function fbss_comments_delete_confirm($form, &$form_state) {
-  fbss_comments_delete_comment($form['#cid']);
+  fbss_comments_delete_comment($form_state['values']['cid']);
   drupal_set_message(t('Status comment deleted.'));
   if (isset($_GET['destination']) && ($_GET['destination'] != 'fbss_comments/js/refresh')) {
     $form_state['redirect'] = $_GET['destination'];
