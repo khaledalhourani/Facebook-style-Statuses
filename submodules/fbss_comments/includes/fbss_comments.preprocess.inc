@@ -5,19 +5,16 @@
  * Preprocess functions for the facebook_status_comments template.
  */
 function template_preprocess_fbss_comments_item(&$variables) {
-
 	$comment = $variables['comment'];
   if (!fbss_comments_can_view($comment)) {
     return FALSE;
   }
-  $classes = $variables['classes'];
-  $destination = $variables['destination'];
-  array_unshift($classes, 'fbss-comments-comment');
+  array_unshift($variables['classes'], 'fbss-comments-comment');
+  $variables['classes_array'] += $variables['classes'];
+  
   // make an object that we pass through drupal_alter (hook_fbss_comments_render_alter),
   // before we pass variables to template.
   $comm = new stdClass;
-  $comm->classes = implode(' ', $classes);
-  
   $userobj = _facebook_status_user_load($comment->uid);
   $comm->userpic = theme('user_picture', array('account' => $userobj));
   $comm->username = theme('username', array('account' => $userobj));
@@ -27,8 +24,8 @@ function template_preprocess_fbss_comments_item(&$variables) {
   $comm->facebook_time = theme('facebook_status_time', array('time' => $comment->created));
   
   $q = $_GET['q'];
-  if ($destination) {
-    $q = $destination;
+  if ($variables['destination']) {
+    $q = $variables['destination'];
   }
   elseif (strpos($q, 'fbss_comments/js/refresh') !== FALSE) {
     $q = '<front>';
@@ -42,5 +39,4 @@ function template_preprocess_fbss_comments_item(&$variables) {
   // Invokes hook_fbss_comments_render_alter(&$output, $comment).
   drupal_alter('fbss_comments_render', $comm, $comment);
   $variables += get_object_vars($comm);
-	
 }

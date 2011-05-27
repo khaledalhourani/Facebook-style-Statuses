@@ -167,12 +167,12 @@ function fbss_comments_theme($existing, $type, $theme, $path) {
  */
 function theme_fbss_comments_items($variables) {
   $comments = $variables['comments'];
-  $delay_load = $variables['delay_load'];
-  $destination = $variables['destination'];
   $count = count($comments);
   if (!$count) {
     return;
   }
+  $delay_load = $variables['delay_load'];
+  $destination = $variables['destination'];
   $path = drupal_get_path('module', 'fbss_comments');
   drupal_add_js($path . '/fbss_comments.js');
   $output = '<div class="fbss-comments">';
@@ -201,7 +201,7 @@ function theme_fbss_comments_items($variables) {
       $classes[] = 'even';
     }
     if ($count > 3 && $key != $count - 1 && $key != $count - 2 && $delay_load) {
-      $classes[] = 'fbss-comments-hide';
+    	$classes[] = 'fbss-comments-hide';
     }
     if (!$delay_load || $count < 10 || $key == $count - 1 || $key == $count - 2) {
       $output .= theme('fbss_comments_item', array('comment' => $comment, 'classes' => $classes, 'destination' => $destination));
