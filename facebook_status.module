@@ -551,7 +551,7 @@ function facebook_status_get_statuses($senders = array(), $recipients = array(),
     $query .= " AND recipient IN (" . db_placeholders($recipients) . ")";
   }
   $query .= " ORDER BY created DESC, sid DESC";
-  $result = ($total > 0 ? $fn($query, $args, 0, $total) : $fn($query, $args));
+  $result = ($total > 0 ? $fn($query, 0, $total, $args) : $fn($query, $args));
   while ($status = $result->fetchObject()) {
     $statuses[] = $status;
   }
