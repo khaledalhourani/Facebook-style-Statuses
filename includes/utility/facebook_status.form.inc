@@ -222,7 +222,8 @@ function facebook_status_box($form, &$form_state, $recipient, $type = 'user') {
     );
   }
   return $form;
-} 
+}
+
 
 /**
  * Validate function for the status update form.

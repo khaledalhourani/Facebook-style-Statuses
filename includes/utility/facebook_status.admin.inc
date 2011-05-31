@@ -42,7 +42,7 @@ function facebook_status_admin($form, &$form_state) {
     '#type' => 'select',
     '#title' => t('Show a view under the status update form at the "Share status" page at /statuses/share'),
     '#description' => t('The default facebook_status_stream view is recommended.'),
-    '#default_value' => variable_get('facebook_status_share_view', $list['facebook_status_mystream']),
+    '#default_value' => variable_get('facebook_status_share_view', $list['facebook_status_stream']),
     '#options' => $list,
     '#weight' => -10,
   );
